@@ -43,6 +43,7 @@ import {
 import {initializeApp} from 'firebase/app';
 import { SignIn } from '@/components/sign-in';
 import { Loading } from '@/components/loading';
+import { NavBar } from '@/components/navbar';
 import {
   Collapsible,
   CollapsibleContent,
@@ -1083,19 +1084,11 @@ Suggested actions:
 
   return (
     <div className="flex flex-col h-screen">
-      <header className="bg-card border-b border-border p-4 flex justify-between items-center">
-        <div className="flex items-center space-x-4">
-          <Avatar>
-            <AvatarImage src={user.photoURL || undefined} alt={user.displayName || "User Avatar"} />
-            <AvatarFallback>{user.email ? user.email[0].toUpperCase() : 'U'}</AvatarFallback>
-          </Avatar>
-          <div>
-            <h1 className="text-xl font-bold">Police Records Manager</h1>
-            <p className="text-sm text-muted-foreground">Clean and validate police case records</p>
-          </div>
-        </div>
-        <Button onClick={handleSignOut} variant="outline">Sign Out</Button>
-      </header>
+      <NavBar 
+        user={user} 
+        onSignOut={handleSignOut} 
+        subtitle="Clean and validate police case records"
+      />
 
       <div className="flex-1 grid grid-cols-1 md:grid-cols-3 gap-6 p-6 overflow-auto">
         {/* Left Panel: File Upload and List */}

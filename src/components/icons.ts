@@ -29,7 +29,8 @@ import {
   Workflow,
   Save,
   Download,
-  AlertTriangle
+  AlertTriangle,
+  Globe
 } from 'lucide-react';
 
 const Icons = {
@@ -48,6 +49,7 @@ const Icons = {
   edit: Edit,
   externalLink: ExternalLink,
   file: File,
+  google: Globe,
   help: HelpCircle,
   home: Home,
   light: Sun,

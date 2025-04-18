@@ -1,6 +1,6 @@
 'use client';
 
-import {useState, useEffect} from 'react';
+import {useState, useEffect, useCallback} from 'react';
 import {useRouter} from 'next/navigation';
 import {
   Table,
@@ -141,6 +141,29 @@ export default function Home() {
     }
   }, [mounted]);
 
+  // Memoize loadFiles to prevent recreation on every render
+  const loadFiles = useCallback(async (userId: string) => {
+    if (!db) {
+      console.error('Firestore not initialized');
+      return;
+    }
+    try {
+      const filesCollection = collection(db, `users/${userId}/files`);
+      const filesSnapshot = await getDocs(filesCollection);
+      const filesList = filesSnapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+      setUploadedFiles(filesList);
+    } catch (error: any) {
+      setError({
+        title: 'Error loading files',
+        description: error.message
+      });
+      console.error('Error loading files:', error);
+    }
+  }, [db, setError]);
+
   // Set up auth state listener after Firebase is initialized
   useEffect(() => {
     if (!mounted || !auth) return;
@@ -156,30 +179,7 @@ export default function Home() {
     });
 
     return () => unsubscribe();
-  }, [mounted, auth]);
-
-  const loadFiles = async (userId: string) => {
-    if (!db) {
-      console.error('Firestore not initialized');
-      return;
-    }
-    try {
-      const filesCollection = collection(db, `users/${userId}/files`);
-      const filesSnapshot = await getDocs(filesCollection);
-      const filesList = filesSnapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data(),
-      }));
-      setUploadedFiles(filesList);
-    } catch (error: any) {
-      toast({
-        title: 'Error loading files',
-        description: error.message,
-        variant: 'destructive',
-      });
-      console.error('Error loading files:', error);
-    }
-  };
+  }, [mounted, auth, loadFiles, db]);
 
   const handleFileUpload = async (file: File) => {
     setFilename(file.name);
@@ -636,28 +636,30 @@ export default function Home() {
     }
   };
 
-  // Apply a specific correction from the correction table
-  const applyCorrection = (correction: any) => {
-    const rowIndex = correction.row - 1; // Convert from 1-indexed to 0-indexed
-    
-    if (rowIndex >= 0 && rowIndex < data.length) {
+  // Apply a single correction
+  const applyCorrection = useCallback((correction: any) => {
+    if (correction?.row && correction?.column) {
       setData(prevData => {
         const newData = [...prevData];
-        newData[rowIndex][correction.column] = correction.suggestedValue;
-        setModified(true);
+        const rowIndex = correction.row - 1; // Convert from 1-indexed to 0-indexed
         
-        toast({
-          title: 'Correction applied',
-          description: `Changed "${correction.originalValue}" to "${correction.suggestedValue}"`,
-        });
+        if (rowIndex >= 0 && rowIndex < newData.length) {
+          newData[rowIndex][correction.column] = correction.suggestedValue;
+          setModified(true);
+          
+          setError({
+            title: 'Correction applied',
+            description: `Changed "${correction.originalValue}" to "${correction.suggestedValue}"`
+          });
+        }
         
         return newData;
       });
     }
-  };
+  }, []);
   
   // Apply all corrections at once
-  const applyAllCorrections = () => {
+  const applyAllCorrections = useCallback(() => {
     if (correctionTable.length === 0) return;
     
     setData(prevData => {
@@ -672,14 +674,14 @@ export default function Home() {
       
       setModified(true);
       
-      toast({
+      setError({
         title: 'All corrections applied',
-        description: `Applied ${correctionTable.length} name corrections`,
+        description: `Applied ${correctionTable.length} name corrections`
       });
       
       return newData;
     });
-  };
+  }, [correctionTable]);
 
   // Render table headers with the expected order
   const renderTableHeaders = () => {
@@ -825,10 +827,10 @@ export default function Home() {
   };
 
   // Function to test Firebase connection
-  const testFirebaseConnection = async () => {
-    toast({
+  const testFirebaseConnection = useCallback(async () => {
+    setError({
       title: 'Testing Firebase connection...',
-      description: 'Please check console for details.',
+      description: 'Please check console for details.'
     });
     
     console.log("==== FIREBASE CONNECTION TEST ====");
@@ -840,51 +842,40 @@ export default function Home() {
     
     if (!db || !user) {
       console.error("Firebase not properly initialized or user not logged in");
-      toast({
+      setError({
         title: 'Firebase connection failed',
-        description: 'Please check console for details.',
-        variant: 'destructive',
+        description: 'Please check console for details.'
       });
       return;
     }
     
     try {
-      // Try to write a test document
-      const testCollection = collection(db, `users/${user.uid}/test`);
-      const docRef = await addDoc(testCollection, {
-        test: true,
+      // Create a test document
+      const testCollection = collection(db, `users/${user.uid}/tests`);
+      const testDoc = await addDoc(testCollection, {
         timestamp: new Date(),
+        message: "Firebase connection test"
       });
       
-      console.log("Test document written with ID:", docRef.id);
+      console.log("Test document created:", testDoc.id);
       
-      // Try to read it back
-      const docSnap = await getDoc(doc(db, `users/${user.uid}/test/${docRef.id}`));
-      console.log("Read test document:", docSnap.exists() ? "Success" : "Failed");
+      // Delete the test document
+      await deleteDoc(doc(db, `users/${user.uid}/tests/${testDoc.id}`));
       
-      if (docSnap.exists()) {
-        console.log("Document data:", docSnap.data());
-        
-        // Try to delete it
-        await deleteDoc(doc(db, `users/${user.uid}/test/${docRef.id}`));
-        console.log("Test document deleted");
-        
-        toast({
-          title: 'Firebase connection successful',
-          description: 'Read and write operations completed successfully.',
-        });
-      } else {
-        throw new Error("Could not read back the test document");
-      }
+      console.log("Test document deleted");
+      
+      setError({
+        title: 'Firebase connection successful',
+        description: 'Successfully created and deleted a test document.'
+      });
     } catch (error: any) {
-      console.error("Firebase test error:", error);
-      toast({
+      console.error("Firebase test failed:", error);
+      setError({
         title: 'Firebase test failed',
-        description: error.message,
-        variant: 'destructive',
+        description: error.message || 'An error occurred while testing the connection.'
       });
     }
-  };
+  }, [db, user, firebaseConfig, firebaseApp, auth]);
 
   // Function to delete a file with confirmation
   const handleDeleteFile = async (fileId: string, fileName: string) => {

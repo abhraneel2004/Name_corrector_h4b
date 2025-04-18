@@ -6,12 +6,22 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
+import { Icons } from '@/components/icons';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
 import {
   signInWithEmailAndPassword,
   GoogleAuthProvider,
   signInWithPopup,
 } from 'firebase/auth';
 import { auth } from '@/lib/firebase';
+import { signInAnonymously } from '@/lib/auth-utils';
 
 export function SignIn() {
   const [email, setEmail] = useState('');
@@ -73,74 +83,175 @@ export function SignIn() {
     }
   };
 
+  const handleAnonymousSignIn = async () => {
+    setLoading(true);
+    try {
+      await signInAnonymously();
+      toast({
+        title: 'Success',
+        description: 'Signed in as guest!',
+      });
+      router.push('/');
+    } catch (error: any) {
+      toast({
+        title: 'Error',
+        description: error.message,
+        variant: 'destructive',
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen p-4">
-      <div className="w-full max-w-md space-y-8">
-        <div className="text-center">
-          <h2 className="text-3xl font-bold">Welcome Back</h2>
-          <p className="mt-2 text-gray-600 dark:text-gray-400">Sign in to your account</p>
-        </div>
-        <form onSubmit={handleEmailSignIn} className="mt-8 space-y-6">
-          <div className="space-y-4">
-            <div>
-              <Label htmlFor="email">Email address</Label>
-              <Input
-                id="email"
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-                className="mt-1"
-                placeholder="Enter your email"
-              />
+    <div className="flex min-h-screen bg-gradient-to-b from-primary/5 via-background to-background">
+      {/* Left side decorative panel */}
+      <div className="hidden md:flex md:w-1/2 bg-gradient-to-br from-primary/20 to-primary/5 flex-col justify-center items-center p-12">
+        <div className="max-w-md text-center">
+          <div className="mb-8 flex justify-center">
+            <Icons.file className="h-20 w-20 text-primary" />
+          </div>
+          <h1 className="text-4xl font-bold tracking-tight mb-6">Indian Name Corrector</h1>
+          <p className="text-xl text-muted-foreground mb-4">
+            Clean and validate Indian names in your datasets with AI-powered suggestions.
+          </p>
+          <div className="mt-12 grid grid-cols-1 gap-4 text-left">
+            <div className="flex items-start space-x-4">
+              <div className="bg-primary/10 p-2 rounded-full">
+                <Icons.check className="h-5 w-5 text-primary" />
+              </div>
+              <div>
+                <h3 className="font-medium">Cultural Awareness</h3>
+                <p className="text-sm text-muted-foreground">Respects the cultural integrity of Indian names</p>
+              </div>
             </div>
-            <div>
-              <Label htmlFor="password">Password</Label>
-              <Input
-                id="password"
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-                className="mt-1"
-                placeholder="Enter your password"
-              />
+            <div className="flex items-start space-x-4">
+              <div className="bg-primary/10 p-2 rounded-full">
+                <Icons.check className="h-5 w-5 text-primary" />
+              </div>
+              <div>
+                <h3 className="font-medium">Smart Corrections</h3>
+                <p className="text-sm text-muted-foreground">AI-powered suggestions with explanations</p>
+              </div>
+            </div>
+            <div className="flex items-start space-x-4">
+              <div className="bg-primary/10 p-2 rounded-full">
+                <Icons.check className="h-5 w-5 text-primary" />
+              </div>
+              <div>
+                <h3 className="font-medium">Batch Processing</h3>
+                <p className="text-sm text-muted-foreground">Upload and correct thousands of names at once</p>
+              </div>
             </div>
           </div>
-          <Button
-            type="submit"
-            className="w-full"
-            disabled={loading}
-          >
-            {loading ? 'Signing in...' : 'Sign in'}
-          </Button>
-        </form>
-        <div className="relative">
-          <div className="absolute inset-0 flex items-center">
-            <div className="w-full border-t border-gray-300 dark:border-gray-700" />
-          </div>
-          <div className="relative flex justify-center text-sm">
-            <span className="px-2 bg-white dark:bg-gray-900 text-gray-500 dark:text-gray-400">Or continue with</span>
-          </div>
         </div>
-        <Button
-          variant="outline"
-          className="w-full"
-          onClick={handleGoogleSignIn}
-          disabled={loading}
-        >
-          {loading ? 'Signing in...' : 'Sign in with Google'}
-        </Button>
-        <div className="text-center text-sm">
-          <span className="text-gray-600 dark:text-gray-400">Don't have an account? </span>
-          <Button
-            variant="link"
-            className="p-0 h-auto font-semibold text-primary hover:underline"
-            onClick={() => router.push('/signup')}
-          >
-            Sign up
-          </Button>
-        </div>
+      </div>
+
+      {/* Right side sign in form */}
+      <div className="flex-1 flex items-center justify-center p-6">
+        <Card className="w-full max-w-md shadow-xl">
+          <CardHeader className="space-y-1">
+            <div className="flex justify-center md:hidden mb-6">
+              <Icons.file className="h-12 w-12 text-primary" />
+            </div>
+            <CardTitle className="text-3xl font-bold text-center">Welcome Back</CardTitle>
+            <CardDescription className="text-center">
+              Sign in to your account to continue
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <form onSubmit={handleEmailSignIn} className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="email">Email</Label>
+                <Input
+                  id="email"
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                  placeholder="name@example.com"
+                  className="w-full"
+                />
+              </div>
+              <div className="space-y-2">
+                <div className="flex justify-between items-center">
+                  <Label htmlFor="password">Password</Label>
+                  <Button variant="link" className="p-0 h-auto text-xs">
+                    Forgot password?
+                  </Button>
+                </div>
+                <Input
+                  id="password"
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                  placeholder="••••••••"
+                  className="w-full"
+                />
+              </div>
+              <Button
+                type="submit"
+                className="w-full"
+                disabled={loading}
+              >
+                {loading ? (
+                  <>
+                    <Icons.spinner className="mr-2 h-4 w-4 animate-spin" />
+                    Signing in...
+                  </>
+                ) : (
+                  'Sign in'
+                )}
+              </Button>
+            </form>
+
+            <div className="relative my-6">
+              <div className="absolute inset-0 flex items-center">
+                <div className="w-full border-t border-border" />
+              </div>
+              <div className="relative flex justify-center text-xs uppercase">
+                <span className="px-2 bg-card text-muted-foreground">Or continue with</span>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 gap-3">
+              <Button
+                variant="outline"
+                onClick={handleGoogleSignIn}
+                disabled={loading}
+                className="w-full"
+              >
+                <Icons.google className="mr-2 h-4 w-4" />
+                Google
+              </Button>
+              <Button
+                variant="outline"
+                onClick={handleAnonymousSignIn}
+                disabled={loading}
+                className="w-full"
+              >
+                <Icons.user className="mr-2 h-4 w-4" />
+                Continue as Guest
+              </Button>
+            </div>
+          </CardContent>
+          <CardFooter className="flex flex-col space-y-4">
+            <div className="text-center text-sm">
+              <span className="text-muted-foreground">Don't have an account? </span>
+              <Button
+                variant="link"
+                className="p-0 h-auto font-medium"
+                onClick={() => router.push('/signup')}
+              >
+                Sign up
+              </Button>
+            </div>
+            <p className="text-xs text-center text-muted-foreground">
+              By continuing, you agree to our Terms of Service and Privacy Policy.
+            </p>
+          </CardFooter>
+        </Card>
       </div>
     </div>
   );

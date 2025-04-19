@@ -107,7 +107,7 @@ export function SignIn() {
   };
 
   return (
-    <div className="flex min-h-screen bg-gradient-to-b from-primary/5 via-background to-background">
+    <div className="flex bg-gradient-to-b from-primary/5 via-background to-background">
       {/* Left side decorative panel */}
       <div className="hidden md:flex md:w-1/2 bg-gradient-to-br from-primary/20 to-primary/5 flex-col justify-center items-center p-12">
         <div className="max-w-md text-center">

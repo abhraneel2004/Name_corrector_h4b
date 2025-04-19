@@ -15,19 +15,17 @@ interface NavBarProps {
 export function NavBar({ 
   user, 
   onSignOut, 
-  title = "Indian Name Corrector", 
-  subtitle = "Clean and validate Indian names" 
+  title = "", 
+  subtitle = "" 
 }: NavBarProps) {
   if (!user) return null;
 
   return (
     <header className="bg-card border-b border-border p-4 flex justify-between items-center">
-      <div className="flex items-center space-x-4">
-        <div className="flex items-center space-x-2">
-          <Icons.file className="h-6 w-6 text-primary" />
-          <h1 className="text-xl font-bold">{title}</h1>
+      <div className="flex items-center space-x-3">
+        <div className="rounded-md">
+          <img src="./long_logo.png" alt="Logo" className="h-20 w-88" />
         </div>
-        <p className="text-sm text-muted-foreground hidden sm:inline-block">{subtitle}</p>
       </div>
       <div className="flex items-center space-x-4">
         <div className="flex flex-col items-end mr-2 hidden sm:flex">

@@ -30,7 +30,10 @@ import {
   Save,
   Download,
   AlertTriangle,
-  Globe
+  Globe,
+  Twitter,
+  Github,
+  Linkedin
 } from 'lucide-react';
 
 const Icons = {
@@ -49,10 +52,12 @@ const Icons = {
   edit: Edit,
   externalLink: ExternalLink,
   file: File,
+  github: Github,
   google: Globe,
   help: HelpCircle,
   home: Home,
   light: Sun,
+  linkedin: Linkedin,
   loader: Loader2,
   mail: Mail,
   messageSquare: MessageSquare,
@@ -68,6 +73,7 @@ const Icons = {
   spinner: Loader2,
   sun: Sun,
   trash: Trash,
+  twitter: Twitter,
   user: User,
   alertTriangle: AlertTriangle
 };

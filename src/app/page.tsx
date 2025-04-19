@@ -60,7 +60,7 @@ const EXPECTED_HEADERS = [
   "Accused First Name",
   "Accused Last Name",
   "Crime",
-  "AccusedStatus",
+  "Accused Status",
   "Criminal Location",
   "Police Station",
   "Inspector In charge",
@@ -98,7 +98,11 @@ export default function Home() {
   const [auditSectionOpen, setAuditSectionOpen] = useState(true);
   const [correctionSectionOpen, setCorrectionSectionOpen] = useState(true);
   // Error state for handling errors
-  const [error, setError] = useState<{title: string, message: string} | null>(null);
+  const [error, setError] = useState<{
+    title: string, 
+    message: string, 
+    variant?: "default" | "destructive" | "success"
+  } | null>(null);
 
   const { toast } = useToast();
   
@@ -108,7 +112,7 @@ export default function Home() {
       toast({
         title: error.title,
         description: error.message,
-        variant: 'destructive',
+        variant: error.variant || 'destructive',
       });
       setError(null);
     }
@@ -690,18 +694,19 @@ export default function Home() {
           newData[rowIndex]["Last Audit Location"] = correction.column;
           
           setModified(true);
-          
-          toast({
-            title: 'Correction applied',
-            description: `Changed "${correction.originalValue}" to "${correction.suggestedValue}"`,
-            variant: 'success',
-          });
         }
         
         return newData;
       });
+      
+      // Show toast directly
+      toast({
+        title: 'Correction applied',
+        description: `Changed "${correction.originalValue}" to "${correction.suggestedValue}"`,
+        variant: 'success',
+      });
     }
-  }, [user?.email]);
+  }, [user?.email, toast]);
   
   // Apply all corrections at once with audit metadata updates
   const applyAllCorrections = useCallback(() => {
@@ -728,15 +733,16 @@ export default function Home() {
       
       setModified(true);
       
-      toast({
-        title: 'All corrections applied',
-        description: `Applied ${correctionTable.length} name corrections`,
-        variant: 'success',
-      });
-      
       return newData;
     });
-  }, [correctionTable, user?.email]);
+    
+    // Show toast directly
+    toast({
+      title: 'All corrections applied',
+      description: `Applied ${correctionTable.length} name corrections`,
+      variant: 'success',
+    });
+  }, [correctionTable, user?.email, toast]);
 
   // Render table headers with the expected order
   const renderTableHeaders = () => {
@@ -1139,7 +1145,7 @@ Suggested actions:
   }
 
   return (
-    <div className="flex flex-col h-screen">
+    <div className="flex flex-col">
       <NavBar 
         user={user} 
         onSignOut={handleSignOut} 

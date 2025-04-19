@@ -620,6 +620,10 @@ body {
   display: block;
 }
 
+.inline-block {
+  display: inline-block;
+}
+
 .flex {
   display: flex;
 }
@@ -657,6 +661,10 @@ body {
   height: 1rem;
 }
 
+.h-1 {
+  height: .25rem;
+}
+
 .h-10 {
   height: 2.5rem;
 }
@@ -681,12 +689,20 @@ body {
   height: 5rem;
 }
 
+.h-3 {
+  height: .75rem;
+}
+
 .h-3\.5 {
   height: .875rem;
 }
 
 .h-4 {
   height: 1rem;
+}
+
+.h-40 {
+  height: 10rem;
 }
 
 .h-5 {
@@ -731,14 +747,6 @@ body {
 
 .h-svh {
   height: 100svh;
-}
-
-.h-0 {
-  height: 0;
-}
-
-.h-40 {
-  height: 10rem;
 }
 
 .max-h-48 {
@@ -813,6 +821,10 @@ body {
   width: 5rem;
 }
 
+.w-3 {
+  width: .75rem;
+}
+
 .w-3\.5 {
   width: .875rem;
 }
@@ -823,6 +835,10 @@ body {
 
 .w-4 {
   width: 1rem;
+}
+
+.w-40 {
+  width: 10rem;
 }
 
 .w-5 {
@@ -863,14 +879,6 @@ body {
 
 .w-full {
   width: 100%;
-}
-
-.w-44 {
-  width: 11rem;
-}
-
-.w-40 {
-  width: 10rem;
 }
 
 .min-w-0 {
@@ -921,8 +929,16 @@ body {
   max-width: 24rem;
 }
 
+.max-w-full {
+  max-width: 100%;
+}
+
 .flex-1 {
   flex: 1;
+}
+
+.flex-shrink-0 {
+  flex-shrink: 0;
 }
 
 .shrink-0 {
@@ -1218,6 +1234,16 @@ body {
   border-radius: .75rem;
 }
 
+.rounded-b-lg {
+  border-bottom-right-radius: var(--radius);
+  border-bottom-left-radius: var(--radius);
+}
+
+.rounded-t-lg {
+  border-top-left-radius: var(--radius);
+  border-top-right-radius: var(--radius);
+}
+
 .border {
   border-width: 1px;
 }
@@ -1232,6 +1258,11 @@ body {
 
 .border-\[1\.5px\] {
   border-width: 1.5px;
+}
+
+.border-x {
+  border-left-width: 1px;
+  border-right-width: 1px;
 }
 
 .border-b {
@@ -1284,12 +1315,21 @@ body {
   border-color: rgb(34 197 94 / var(--tw-border-opacity, 1));
 }
 
+.border-green-600 {
+  --tw-border-opacity: 1;
+  border-color: rgb(22 163 74 / var(--tw-border-opacity, 1));
+}
+
 .border-input {
   border-color: hsl(var(--input));
 }
 
 .border-primary {
   border-color: hsl(var(--primary));
+}
+
+.border-secondary {
+  border-color: hsl(var(--secondary));
 }
 
 .border-sidebar-border {
@@ -1302,6 +1342,10 @@ body {
 
 .border-l-transparent {
   border-left-color: #0000;
+}
+
+.border-r-transparent {
+  border-right-color: #0000;
 }
 
 .border-t-transparent {
@@ -1344,6 +1388,11 @@ body {
 
 .bg-destructive {
   background-color: hsl(var(--destructive));
+}
+
+.bg-gray-200 {
+  --tw-bg-opacity: 1;
+  background-color: rgb(229 231 235 / var(--tw-bg-opacity, 1));
 }
 
 .bg-green-50 {
@@ -1419,11 +1468,6 @@ body {
 .bg-white {
   --tw-bg-opacity: 1;
   background-color: rgb(255 255 255 / var(--tw-bg-opacity, 1));
-}
-
-.bg-black {
-  --tw-bg-opacity: 1;
-  background-color: rgb(0 0 0 / var(--tw-bg-opacity, 1));
 }
 
 .bg-gradient-to-b {
@@ -1900,6 +1944,12 @@ body {
 
 .opacity-90 {
   opacity: .9;
+}
+
+.shadow {
+  --tw-shadow: 0 1px 3px 0 #0000001a, 0 1px 2px -1px #0000001a;
+  --tw-shadow-colored: 0 1px 3px 0 var(--tw-shadow-color), 0 1px 2px -1px var(--tw-shadow-color);
+  box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
 }
 
 .shadow-\[0_0_0_1px_hsl\(var\(--sidebar-border\)\)\] {
@@ -3047,6 +3097,10 @@ body {
     top: auto;
   }
 
+  .sm\:col-span-2 {
+    grid-column: span 2 / span 2;
+  }
+
   .sm\:mt-0 {
     margin-top: 0;
   }
@@ -3059,6 +3113,10 @@ body {
     max-width: 24rem;
   }
 
+  .sm\:grid-cols-2 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
   .sm\:flex-row {
     flex-direction: row;
   }
@@ -3069,6 +3127,10 @@ body {
 
   .sm\:justify-end {
     justify-content: flex-end;
+  }
+
+  .sm\:gap-6 {
+    gap: 1.5rem;
   }
 
   .sm\:space-x-2 > :not([hidden]) ~ :not([hidden]) {
@@ -3093,6 +3155,15 @@ body {
     border-radius: var(--radius);
   }
 
+  .sm\:p-6 {
+    padding: 1.5rem;
+  }
+
+  .sm\:px-6 {
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+  }
+
   .sm\:text-left {
     text-align: left;
   }
@@ -3105,6 +3176,10 @@ body {
 @media (width >= 768px) {
   .md\:col-span-2 {
     grid-column: span 2 / span 2;
+  }
+
+  .md\:col-span-1 {
+    grid-column: span 1 / span 1;
   }
 
   .md\:mt-0 {
@@ -3194,6 +3269,20 @@ body {
     --tw-shadow: 0 1px 3px 0 #0000001a, 0 1px 2px -1px #0000001a;
     --tw-shadow-colored: 0 1px 3px 0 var(--tw-shadow-color), 0 1px 2px -1px var(--tw-shadow-color);
     box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
+  }
+}
+
+@media (width >= 1024px) {
+  .lg\:col-span-2 {
+    grid-column: span 2 / span 2;
+  }
+
+  .lg\:col-span-1 {
+    grid-column: span 1 / span 1;
+  }
+
+  .lg\:grid-cols-3 {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 }
 

@@ -1,7 +1,7 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
-import { useRouter } from 'next/navigation';
+import {useState, useEffect, useCallback} from 'react';
+import {useRouter} from 'next/navigation';
 import {
   Table,
   TableHeader,
@@ -10,20 +10,20 @@ import {
   TableBody,
   TableCell,
 } from '@/components/ui/table';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { AlertDialog, AlertDialogTrigger, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter, AlertDialogAction, AlertDialogCancel } from '@/components/ui/alert-dialog';
-import { useToast } from '@/hooks/use-toast';
-import { Textarea } from '@/components/ui/textarea';
-import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
-import { Separator } from '@/components/ui/separator';
-import { Icons } from '@/components/icons';
-import { auditDataForIndianNames } from '@/ai/flows/audit-data-for-indian-names';
-import { provideDataAuditSummary } from '@/ai/flows/provide-data-audit-summary';
-import { suggestDataCorrections } from '@/ai/flows/suggest-data-corrections';
-import { Toaster } from "@/components/ui/toaster"
-import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
-import { Label } from "@/components/ui/label";
+import {Button} from '@/components/ui/button';
+import {Input} from '@/components/ui/input';
+import {AlertDialog, AlertDialogTrigger, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter, AlertDialogAction, AlertDialogCancel} from '@/components/ui/alert-dialog';
+import {useToast} from '@/hooks/use-toast';
+import {Textarea} from '@/components/ui/textarea';
+import {Card, CardHeader, CardTitle, CardDescription, CardContent} from '@/components/ui/card';
+import {Separator} from '@/components/ui/separator';
+import {Icons} from '@/components/icons';
+import {auditDataForIndianNames} from '@/ai/flows/audit-data-for-indian-names';
+import {provideDataAuditSummary} from '@/ai/flows/provide-data-audit-summary';
+import {suggestDataCorrections} from '@/ai/flows/suggest-data-corrections';
+import {Toaster} from "@/components/ui/toaster"
+import {Avatar, AvatarImage, AvatarFallback} from "@/components/ui/avatar";
+import {Label} from "@/components/ui/label";
 import {
   getAuth,
   onAuthStateChanged,
@@ -40,7 +40,7 @@ import {
   updateDoc,
   getDoc,
 } from 'firebase/firestore';
-import { initializeApp } from 'firebase/app';
+import {initializeApp} from 'firebase/app';
 import { SignIn } from '@/components/sign-in';
 import { Loading } from '@/components/loading';
 import { NavBar } from '@/components/navbar';
@@ -49,11 +49,6 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
-import { AnimatedCard } from '@/components/ui/animated-card';
-import { AnimatedButton } from '@/components/ui/animated-button';
-import { AnimatedLoader } from '@/components/ui/animated-loader';
-import { AnimatedListItem } from '@/components/ui/animations';
-import { AnimatedCardCollapsible } from '@/components/ui/animated-collapsible';
 
 // Define a type for the data, each key is a string, and value can be a string or number
 type Data = Record<string, string>;
@@ -104,13 +99,13 @@ export default function Home() {
   const [correctionSectionOpen, setCorrectionSectionOpen] = useState(true);
   // Error state for handling errors
   const [error, setError] = useState<{
-    title: string,
-    message: string,
+    title: string, 
+    message: string, 
     variant?: "default" | "destructive" | "success"
   } | null>(null);
 
   const { toast } = useToast();
-
+  
   // Effect to handle errors and show toasts
   useEffect(() => {
     if (error) {
@@ -141,7 +136,7 @@ export default function Home() {
       appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
     };
     setFirebaseConfig(config);
-
+      
     if (!firebaseApp && config.apiKey) {
       try {
         const app = initializeApp(config);
@@ -209,18 +204,18 @@ export default function Home() {
         try {
           // Split by newlines and handle different line ending formats
           const rows = result.split(/\r?\n/);
-
+          
           // Get headers from the first row
           const headerLine = rows[0];
           const headers = parseCSVLine(headerLine);
-
+          
           console.log("File headers:", headers);
-
+          
           // Validate headers against expected structure
           const missingHeaders = EXPECTED_HEADERS.filter(
             header => !headers.includes(header)
           );
-
+          
           if (missingHeaders.length > 0) {
             setError({
               title: 'CSV format error',
@@ -228,20 +223,20 @@ export default function Home() {
             });
             // Continue anyway, but show the warning
           }
-
+          
           // Parse data rows
           const parsedData: Data[] = [];
           for (let i = 1; i < rows.length; i++) {
             if (rows[i].trim() === '') continue; // Skip empty rows
-
+            
             const values = parseCSVLine(rows[i]);
             const rowData: Data = {};
-
+            
             // Map values to headers
             headers.forEach((header, index) => {
               rowData[header] = values[index] || '';
             });
-
+            
             // Only add row if it has at least one non-empty value
             if (Object.values(rowData).some(value => value !== '')) {
               parsedData.push(rowData);
@@ -278,10 +273,10 @@ export default function Home() {
     const result: string[] = [];
     let current = '';
     let inQuotes = false;
-
+    
     for (let i = 0; i < line.length; i++) {
       const char = line[i];
-
+      
       if (char === '"') {
         inQuotes = !inQuotes;
       } else if (char === ',' && !inQuotes) {
@@ -291,10 +286,10 @@ export default function Home() {
         current += char;
       }
     }
-
+    
     // Don't forget the last field
     result.push(current.trim());
-
+    
     return result;
   };
 
@@ -303,19 +298,19 @@ export default function Home() {
       console.error('Firestore not initialized');
       throw new Error('Database not initialized. Please try again later.');
     }
-
+    
     try {
       console.log(`Uploading file to Firestore: ${fileName} (${fileSize} bytes) for user ${userId}`);
-
+      
       // Check if a file with the same name already exists
       const filesCollection = collection(db, `users/${userId}/files`);
       const querySnapshot = await getDocs(filesCollection);
-
+      
       // Find files with the same name
-      const existingFiles = querySnapshot.docs.filter(doc =>
+      const existingFiles = querySnapshot.docs.filter(doc => 
         doc.data().name === fileName
       );
-
+      
       // If file exists with the same name, update it instead of adding a new one
       if (existingFiles.length > 0) {
         const fileDoc = existingFiles[0];
@@ -327,7 +322,7 @@ export default function Home() {
         console.log(`Updated existing file with ID: ${fileDoc.id}`);
         return fileDoc.id;
       }
-
+      
       // Otherwise, add as a new file
       const docRef = await addDoc(filesCollection, {
         name: fileName,
@@ -335,7 +330,7 @@ export default function Home() {
         data: fileData,
         uploadedAt: new Date(),
       });
-
+      
       console.log(`Added new file with ID: ${docRef.id}`);
       return docRef.id;
     } catch (error: any) {
@@ -380,7 +375,7 @@ export default function Home() {
   };
 
   const handleDeleteRow = (index: number) => {
-    AlertDialog({ children: 'Are you sure you want to delete this row?' });
+    AlertDialog({children: 'Are you sure you want to delete this row?'});
     setData(prevData => {
       const newData = [...prevData];
       newData.splice(index, 1);
@@ -409,33 +404,33 @@ export default function Home() {
       });
       return;
     }
-
+    
     // Show loading toast immediately
     toast({
       title: 'Preparing data...',
       description: 'Getting ready to save your changes.',
     });
-
+    
     try {
       // Verify prerequisites
       if (!db) {
         throw new Error('Database not initialized. Please try again later.');
       }
-
+      
       if (!user || !user.uid) {
         throw new Error('You need to be logged in to upload files.');
       }
-
+      
       // Generate the filename with timestamp to avoid conflicts
       const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
-      const fileName = filename ?
-        `${filename.replace(/\.[^/.]+$/, '')}_updated_${timestamp}.csv` :
+      const fileName = filename ? 
+        `${filename.replace(/\.[^/.]+$/, '')}_updated_${timestamp}.csv` : 
         `data_export_${timestamp}.csv`;
-
+      
       // Convert data to CSV format
       const headers = Object.keys(data[0]);
       const csvRows = [headers.join(',')];
-
+      
       data.forEach(row => {
         const values = headers.map(header => {
           // Handle values with commas by quoting them
@@ -444,57 +439,57 @@ export default function Home() {
         });
         csvRows.push(values.join(','));
       });
-
+      
       const csvContent = csvRows.join('\n');
-
+      
       // Show uploading toast
       toast({
         title: 'Uploading to cloud...',
         description: 'Please wait while your data is being saved.',
       });
-
+      
       // Upload to Firestore
       const fileId = await uploadFileToFirestore(
-        user.uid,
-        fileName,
-        csvContent.length,
+        user.uid, 
+        fileName, 
+        csvContent.length, 
         csvContent
       );
-
+      
       // Update local state variables
       setFilename(fileName);
       setFilesize(csvContent.length);
       setModified(false); // Reset modified flag
-
+      
       // Refresh the file list
       await loadFiles(user.uid);
-
+      
       // Show success toast
       toast({
         title: 'Upload successful!',
         description: `Data saved as "${fileName}"`,
         variant: 'success',
       });
-
+      
       return fileId;
     } catch (error: any) {
       console.error('Upload failed:', error);
-
+      
       // Show error toast
       toast({
         title: 'Upload failed',
         description: error.message || 'An unexpected error occurred',
         variant: 'destructive',
       });
-
+      
       return null;
     }
   };
-
+  
   // Function to hide the current data table
   const handleHideData = () => {
     if (data.length === 0) return;
-
+    
     setData([]);
     setFilename('');
     setFilesize(0);
@@ -503,13 +498,13 @@ export default function Home() {
     setAuditSummary('');
     setDataCorrections('');
     setCorrectionTable([]);
-
+    
     toast({
       title: 'Data hidden',
       description: 'The data table has been cleared.',
     });
   };
-
+  
   // Function to download the current data as CSV
   const handleDownloadData = () => {
     if (data.length === 0) {
@@ -520,12 +515,12 @@ export default function Home() {
       });
       return;
     }
-
+    
     try {
       // Convert data to CSV format
       const headers = Object.keys(data[0]);
       const csvRows = [headers.join(',')];
-
+      
       data.forEach(row => {
         const values = headers.map(header => {
           // Handle values with commas by quoting them
@@ -534,23 +529,23 @@ export default function Home() {
         });
         csvRows.push(values.join(','));
       });
-
+      
       const csvContent = csvRows.join('\n');
       const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
       const url = URL.createObjectURL(blob);
-
+      
       // Create a temporary link and trigger download
       const link = document.createElement('a');
-      const downloadFilename = filename ?
-        filename.replace(/\.[^/.]+$/, '') + '_updated.csv' :
+      const downloadFilename = filename ? 
+        filename.replace(/\.[^/.]+$/, '') + '_updated.csv' : 
         `data_export_${new Date().toISOString().split('T')[0]}.csv`;
-
+      
       link.href = url;
       link.setAttribute('download', downloadFilename);
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
-
+      
       toast({
         title: 'Download started',
         description: `Downloading ${downloadFilename}`,
@@ -570,19 +565,19 @@ export default function Home() {
     setLoadingAudit(true);
     try {
       // Convert data to the format expected by auditDataForIndianNames
-      const auditInput = { data: data };
+      const auditInput = {data: data};
       const auditOutput = await auditDataForIndianNames(auditInput);
       setAuditResults(JSON.stringify(auditOutput, null, 2));
 
       // Get audit summary
-      const summaryInput = { auditResults: JSON.stringify(auditOutput, null, 2) };
+      const summaryInput = {auditResults: JSON.stringify(auditOutput, null, 2)};
       const summaryOutput = await provideDataAuditSummary(summaryInput);
       setAuditSummary(summaryOutput.summary);
 
       // Extract names for corrections from specific columns
       const nameColumns = ['Accused First Name', 'Accused Last Name', 'Inspector In charge'];
       const namesArray: string[] = [];
-
+      
       // Extract names from the data
       data.forEach(row => {
         nameColumns.forEach(col => {
@@ -591,13 +586,13 @@ export default function Home() {
           }
         });
       });
-
+      
       console.log('Extracted names for correction:', namesArray);
-
+      
       // Get data corrections with the names array
       const correctionsInput = { names: namesArray };
       const correctionsOutput = await suggestDataCorrections(correctionsInput);
-
+      
       // Process corrections output
       let correctionsText = "Name correction suggestions:\n\n";
       correctionsOutput.correctionResults.forEach(correction => {
@@ -605,9 +600,9 @@ export default function Home() {
           correctionsText += `- "${correction.originalName}" should be "${correction.suggestedName}" (${correction.reason || 'No specific reason provided'})\n`;
         }
       });
-
+      
       setDataCorrections(correctionsText);
-
+      
       // Create a correction table compatible with the existing UI
       const correctionTableData = correctionsOutput.correctionResults
         .filter(item => item.hasCorrection)
@@ -615,7 +610,7 @@ export default function Home() {
           // Find the row and column for this name
           let row = 0;
           let column = '';
-
+          
           // Search through data to find the matching name
           data_loop:
           for (let i = 0; i < data.length; i++) {
@@ -627,7 +622,7 @@ export default function Home() {
               }
             }
           }
-
+          
           return {
             row: row,
             column: column,
@@ -637,13 +632,13 @@ export default function Home() {
           };
         })
         .filter(item => item.row > 0 && item.column); // Only include items where we found the row and column
-
+      
       setCorrectionTable(correctionTableData);
 
       // Update Last Audit fields when corrections are applied
       if (correctionTableData.length > 0) {
         const currentDate = new Date().toISOString().split('T')[0]; // YYYY-MM-DD format
-
+        
         setData(prevData => {
           const newData = [...prevData];
           correctionTableData.forEach(correction => {
@@ -669,7 +664,7 @@ export default function Home() {
         title: 'Error auditing data',
         message: error.message || 'An unexpected error occurred during the audit'
       });
-
+      
       setAuditResults('Error during audit.');
       setAuditSummary('Error during audit.');
       setDataCorrections('Error during audit.');
@@ -685,11 +680,11 @@ export default function Home() {
       setData(prevData => {
         const newData = [...prevData];
         const rowIndex = correction.row - 1; // Convert from 1-indexed to 0-indexed
-
+        
         if (rowIndex >= 0 && rowIndex < newData.length) {
           // Apply the correction
           newData[rowIndex][correction.column] = correction.suggestedValue;
-
+          
           // Update audit metadata
           const currentDate = new Date().toISOString().split('T')[0]; // YYYY-MM-DD format
           newData[rowIndex]["Last Audit Date"] = currentDate;
@@ -697,13 +692,13 @@ export default function Home() {
           newData[rowIndex]["Last Audit Status"] = "Corrected";
           newData[rowIndex]["Last Audit Remarks"] = `Corrected "${correction.originalValue}" to "${correction.suggestedValue}"`;
           newData[rowIndex]["Last Audit Location"] = correction.column;
-
+          
           setModified(true);
         }
-
+        
         return newData;
       });
-
+      
       // Show toast directly
       toast({
         title: 'Correction applied',
@@ -712,21 +707,21 @@ export default function Home() {
       });
     }
   }, [user?.email, toast]);
-
+  
   // Apply all corrections at once with audit metadata updates
   const applyAllCorrections = useCallback(() => {
     if (correctionTable.length === 0) return;
-
+    
     setData(prevData => {
       const newData = [...prevData];
       const currentDate = new Date().toISOString().split('T')[0]; // YYYY-MM-DD format
-
+      
       correctionTable.forEach(correction => {
         const rowIndex = correction.row - 1; // Convert from 1-indexed to 0-indexed
         if (rowIndex >= 0 && rowIndex < newData.length) {
           // Apply the correction
           newData[rowIndex][correction.column] = correction.suggestedValue;
-
+          
           // Update audit metadata
           newData[rowIndex]["Last Audit Date"] = currentDate;
           newData[rowIndex]["Last Audit By"] = user?.email || "Anonymous User";
@@ -735,12 +730,12 @@ export default function Home() {
           newData[rowIndex]["Last Audit Location"] = correction.column;
         }
       });
-
+      
       setModified(true);
-
+      
       return newData;
     });
-
+    
     // Show toast directly
     toast({
       title: 'All corrections applied',
@@ -752,16 +747,16 @@ export default function Home() {
   // Render table headers with the expected order
   const renderTableHeaders = () => {
     if (data.length === 0) return null;
-
+    
     // Get the actual headers from the data
     const availableHeaders = Object.keys(data[0]);
-
+    
     // Create a sorted list with expected headers first, then any additional headers
     const orderedHeaders = [
       ...EXPECTED_HEADERS.filter(header => availableHeaders.includes(header)),
       ...availableHeaders.filter(header => !EXPECTED_HEADERS.includes(header))
     ];
-
+    
     return (
       <TableHeader>
         <TableRow>
@@ -779,16 +774,16 @@ export default function Home() {
   // Render table rows with the expected order
   const renderTableRows = () => {
     if (data.length === 0) return null;
-
+    
     // Get the actual headers from the data
     const availableHeaders = Object.keys(data[0]);
-
+    
     // Create a sorted list with expected headers first, then any additional headers
     const orderedHeaders = [
       ...EXPECTED_HEADERS.filter(header => availableHeaders.includes(header)),
       ...availableHeaders.filter(header => !EXPECTED_HEADERS.includes(header))
     ];
-
+    
     return data.map((row, rowIndex) => (
       <TableRow key={rowIndex}>
         {orderedHeaders.map((header) => (
@@ -831,11 +826,11 @@ export default function Home() {
       });
       return;
     }
-
+    
     try {
       // Get the file document
       const fileDoc = await getDoc(doc(db, `users/${user.uid}/files/${fileId}`));
-
+      
       if (!fileDoc.exists()) {
         setError({
           title: 'File not found',
@@ -843,42 +838,42 @@ export default function Home() {
         });
         return;
       }
-
+      
       const fileData = fileDoc.data();
       setFilename(fileData.name);
       setFilesize(fileData.size);
-
+      
       // Parse the CSV data
       const csvData = fileData.data;
       const rows = csvData.split(/\r?\n/);
-
+      
       // Get headers from the first row
       const headerLine = rows[0];
       const headers = parseCSVLine(headerLine);
-
+      
       // Parse data rows
       const parsedData: Data[] = [];
       for (let i = 1; i < rows.length; i++) {
         if (rows[i].trim() === '') continue; // Skip empty rows
-
+        
         const values = parseCSVLine(rows[i]);
         const rowData: Data = {};
-
+        
         // Map values to headers
         headers.forEach((header, index) => {
           rowData[header] = values[index] || '';
         });
-
+        
         // Only add row if it has at least one non-empty value
         if (Object.values(rowData).some(value => value !== '')) {
           parsedData.push(rowData);
         }
       }
-
+      
       // Set the parsed data to state
       setData(parsedData);
       setModified(false);
-
+      
       toast({
         title: 'File loaded',
         description: `${fileData.name} has been loaded.`,
@@ -899,14 +894,14 @@ export default function Home() {
       title: 'Testing Firebase connection...',
       message: 'Please check console for details.'
     });
-
+    
     console.log("==== FIREBASE CONNECTION TEST ====");
     console.log("Firebase Config:", firebaseConfig);
     console.log("Firebase App initialized:", !!firebaseApp);
     console.log("Auth instance:", !!auth);
     console.log("Firestore instance:", !!db);
     console.log("Current user:", user ? `User ID: ${user.uid}` : "No user logged in");
-
+    
     if (!db || !user) {
       console.error("Firebase not properly initialized or user not logged in");
       setError({
@@ -915,7 +910,7 @@ export default function Home() {
       });
       return;
     }
-
+    
     try {
       // Create a test document
       const testCollection = collection(db, `users/${user.uid}/tests`);
@@ -923,14 +918,14 @@ export default function Home() {
         timestamp: new Date(),
         message: "Firebase connection test"
       });
-
+      
       console.log("Test document created:", testDoc.id);
-
+      
       // Delete the test document
       await deleteDoc(doc(db, `users/${user.uid}/tests/${testDoc.id}`));
-
+      
       console.log("Test document deleted");
-
+      
       toast({
         title: 'Firebase connection successful',
         description: 'Successfully created and deleted a test document.',
@@ -951,7 +946,7 @@ export default function Home() {
     if (!confirm(`Are you sure you want to delete "${fileName}"?`)) {
       return; // User cancelled
     }
-
+    
     if (!db || !user) {
       toast({
         title: 'Error',
@@ -960,25 +955,25 @@ export default function Home() {
       });
       return;
     }
-
+    
     try {
       // Show loading toast
       toast({
         title: 'Deleting file...',
         description: `Removing "${fileName}" from your files.`,
       });
-
+      
       // Delete the file document from Firestore
       await deleteDoc(doc(db, `users/${user.uid}/files/${fileId}`));
-
+      
       // Update the uploaded files list
       setUploadedFiles(prevFiles => prevFiles.filter(file => file.id !== fileId));
-
+      
       toast({
         title: 'File deleted',
         description: `"${fileName}" has been removed from your files.`,
       });
-
+      
       // If the currently loaded file was deleted, clear the data view
       if (filename === fileName) {
         setData([]);
@@ -1030,18 +1025,18 @@ export default function Home() {
       try {
         // Get API key from the environment
         const GOOGLE_GENAI_API_KEY = process.env.NEXT_PUBLIC_GOOGLE_GENAI_API_KEY;
-
+        
         if (!GOOGLE_GENAI_API_KEY) {
           throw new Error('No API key found for Google Gemini');
         }
-
+        
         // Reduce the size of the context if retrying due to rate limit
         const maxContextItems = retries === 0 ? data.length : Math.floor(data.length / (retries + 1));
         const contextData = data.slice(0, maxContextItems);
-
+        
         // Convert data to context for the RAG query
         const dataContext = JSON.stringify(contextData, null, 2);
-
+        
         // Create a prompt for Gemini
         const prompt = `
 You are an AI assistant that helps analyze police records data. 
@@ -1091,7 +1086,7 @@ If the answer cannot be determined from the data, say so.
         }
 
         const responseData = await response.json();
-
+        
         if (responseData.candidates && responseData.candidates[0]?.content?.parts[0]?.text) {
           setQueryResult(responseData.candidates[0].content.parts[0].text);
           success = true;
@@ -1100,13 +1095,13 @@ If the answer cannot be determined from the data, say so.
         }
       } catch (error: any) {
         console.error(`Error in RAG query (attempt ${retries + 1}):`, error);
-
+        
         if (error.message.includes('429') || error.message.includes('Rate limit')) {
           // If this is not the last retry
           if (retries < maxRetries) {
             // Wait before retrying with exponential backoff
             const backoffTime = Math.pow(2, retries) * 1000;
-            setQueryResult(`The AI service is busy. Retrying in ${backoffTime / 1000} seconds...`);
+            setQueryResult(`The AI service is busy. Retrying in ${backoffTime/1000} seconds...`);
             await new Promise(resolve => setTimeout(resolve, backoffTime));
             retries++;
           } else {
@@ -1118,7 +1113,7 @@ Suggested actions:
 2. Reduce the amount of data you're analyzing
 3. Wait a few minutes before trying again`
             );
-
+            
             setError({
               title: 'Rate limit reached',
               message: 'The AI service is currently busy. Please try again later.'
@@ -1135,7 +1130,7 @@ Suggested actions:
         }
       }
     }
-
+    
     setIsQuerying(false);
   };
 
@@ -1151,71 +1146,65 @@ Suggested actions:
 
   return (
     <div className="flex flex-col">
-      <NavBar
-        user={user}
-        onSignOut={handleSignOut}
+      <NavBar 
+        user={user} 
+        onSignOut={handleSignOut} 
         subtitle="Clean and validate police case records"
       />
+
       <div className="flex-1 grid grid-cols-1 md:grid-cols-3 gap-6 p-6 overflow-auto">
         {/* Left Panel: File Upload and List */}
-        <AnimatedCard
-          className="col-span-1 flex flex-col w-full h-full"
-          animation="slide"
-          delay={0.1}
-          hoverEffect="shadow"
-        >
+        <Card className="col-span-1 flex flex-col">
           <CardHeader>
             <CardTitle>File Management</CardTitle>
             <CardDescription>Upload CSV files for auditing and correction.</CardDescription>
           </CardHeader>
-          <CardContent className="flex-1 flex flex-col space-y-4 w-full">
-            <div className="space-y-2 w-full">
+          <CardContent className="flex-1 flex flex-col space-y-4">
+            <div className="space-y-2">
               <Label htmlFor="file-upload">Upload a CSV file</Label>
               <Input
                 id="file-upload"
                 type="file"
                 accept=".csv"
                 onChange={(e) => e.target.files && handleFileUpload(e.target.files[0])}
-                className="w-full cursor-pointer file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-primary file:text-primary-foreground hover:file:bg-primary/90"
+                className="cursor-pointer file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-primary file:text-primary-foreground hover:file:bg-primary/90"
               />
             </div>
-            <Separator className="w-full" />
-            <div className="flex-1 w-full">
+            <Separator />
+            <div>
               <h3 className="text-lg font-semibold mb-2">Uploaded Files</h3>
               {uploadedFiles.length > 0 ? (
-                <ul className="space-y-2 overflow-y-auto max-h-48 w-full">
-                  {uploadedFiles.map((file, index) => (
-                    <AnimatedListItem key={file.id} index={index} className="flex justify-between items-center p-2 bg-secondary rounded-md w-full">
-                      <span className="text-sm text-secondary-foreground truncate flex-1" title={file.name}>{file.name}</span>
-                      <div className="flex items-center space-x-2 flex-shrink-0">
-                        <AnimatedButton
+                <ul className="space-y-2 overflow-y-auto max-h-48">
+                  {uploadedFiles.map((file) => (
+                    <li key={file.id} className="flex justify-between items-center p-2 bg-secondary rounded-md">
+                      <span className="text-sm text-secondary-foreground truncate" title={file.name}>{file.name}</span>
+                      <div className="flex items-center space-x-2">
+                        <Button
                           variant="outline"
                           size="sm"
                           onClick={() => handleLoadFile(file.id)}
-                          animationMode="pulse"
                         >
                           Load
-                        </AnimatedButton>
-                        <AnimatedButton
+                        </Button>
+                        <Button
                           variant="ghost"
                           size="sm"
                           onClick={() => handleDeleteFile(file.id, file.name)}
                           className="text-red-500 hover:text-red-700 hover:bg-red-50/50"
-                          animationMode="ripple"
                         >
                           <Icons.trash className="h-4 w-4" />
-                        </AnimatedButton>
+                        </Button>
                       </div>
-                    </AnimatedListItem>
+                    </li>
                   ))}
                 </ul>
               ) : (
                 <p className="text-sm text-muted-foreground">No files uploaded yet.</p>
               )}
-
+              
               {/* Debug button - only in development */}
               {process.env.NODE_ENV === 'development' && (
-                <div className="mt-4 w-full">
+                <div className="mt-4">
                   <Button
                     variant="secondary"
                     size="sm"
@@ -1228,9 +1217,7 @@ Suggested actions:
               )}
             </div>
           </CardContent>
-        </AnimatedCard>
-
-        {/* ------------------------------------------------------------------------------------------ */}
+        </Card>
 
         {/* Center Panel: Data Table and Actions */}
         <Card className="col-span-1 md:col-span-2 flex flex-col">
@@ -1257,7 +1244,7 @@ Suggested actions:
             </div>
             <div className="flex justify-between items-center pt-4 border-t">
               <div className="flex items-center space-x-2">
-                <AnimatedButton onClick={handleAuditData} disabled={data.length === 0 || loadingAudit}>
+                <Button onClick={handleAuditData} disabled={data.length === 0 || loadingAudit}>
                   {loadingAudit ? (
                     <>
                       <Icons.spinner className="mr-2 h-4 w-4 animate-spin" />
@@ -1266,35 +1253,31 @@ Suggested actions:
                   ) : (
                     'Audit Data'
                   )}
-                </AnimatedButton>
-                <AnimatedButton onClick={handleSend} disabled={!modified} variant="secondary">
+                </Button>
+                <Button onClick={handleSend} disabled={!modified} variant="secondary">
                   Save Changes
-                </AnimatedButton>
-                <AnimatedButton
-                  onClick={handleUploadCurrentData}
-                  disabled={data.length === 0}
+                </Button>
+                <Button 
+                  onClick={handleUploadCurrentData} 
+                  disabled={data.length === 0} 
                   variant="default"
                   className="bg-green-600 hover:bg-green-700"
-                  animationMode="shine"
                 >
                   <Icons.save className="mr-2 h-4 w-4" />
                   Upload
-                </AnimatedButton>
-                <AnimatedButton onClick={handleDownloadData} disabled={data.length === 0} variant="outline">
+                </Button>
+                <Button onClick={handleDownloadData} disabled={data.length === 0} variant="outline">
                   <Icons.download className="mr-2 h-4 w-4" />
                   Download
-                </AnimatedButton>
+                </Button>
               </div>
             </div>
           </CardContent>
         </Card>
       </div>
 
-
-
       {/* Data Analysis with RAG */}
-      <div className="px-3 sm:px-6 pt-0 w-full max-w-full">
-
+      <div className="p-6 pt-0">
         <Collapsible open={aiSectionOpen} onOpenChange={setAiSectionOpen} className="w-full">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between">
@@ -1306,8 +1289,8 @@ Suggested actions:
               </div>
               <CollapsibleTrigger asChild>
                 <Button variant="ghost" size="sm">
-                  {aiSectionOpen ?
-                    <Icons.collapse className="h-4 w-4" /> :
+                  {aiSectionOpen ? 
+                    <Icons.collapse className="h-4 w-4" /> : 
                     <Icons.expand className="h-4 w-4" />
                   }
                 </Button>
@@ -1329,22 +1312,21 @@ Suggested actions:
                     }}
                     className="flex-1"
                   />
-                  <AnimatedButton
-                    onClick={handleRagQuery}
+                  <Button 
+                    onClick={handleRagQuery} 
                     disabled={isQuerying || data.length === 0 || !queryInput.trim()}
-                    animationMode={isQuerying ? "none" : "shine"}
                   >
                     {isQuerying ? (
                       <>
-                        <AnimatedLoader variant="dots" size="sm" className="mr-2" />
+                        <Icons.spinner className="mr-2 h-4 w-4 animate-spin" />
                         Thinking...
                       </>
                     ) : (
                       'Ask'
                     )}
-                  </AnimatedButton>
+                  </Button>
                 </div>
-
+                
                 {queryResult && (
                   <div className="max-h-[300px] overflow-y-auto pr-2">
                     <Card className="mt-4 bg-muted/50">
@@ -1357,7 +1339,7 @@ Suggested actions:
                     </Card>
                   </div>
                 )}
-
+                
                 {!data.length && (
                   <div className="flex items-center justify-center p-4 border rounded-md border-dashed">
                     <p className="text-muted-foreground text-center">
@@ -1373,54 +1355,54 @@ Suggested actions:
 
       {/* Audit Results Section */}
       {(auditResults || auditSummary || dataCorrections) && (
-        <div className="px-3 sm:px-6 pt-0 w-full max-w-full">
-          <AnimatedCardCollapsible
-            open={auditSectionOpen}
-            onOpenChange={setAuditSectionOpen}
-            cardClassName="w-full"
-            title="Audit Results"
-            headerClassName="bg-card rounded-t-lg border border-border p-4"
-            contentClassName="bg-card rounded-b-lg border-x border-b border-border"
-            trigger={
-              <Button variant="ghost" size="sm">
-                {auditSectionOpen ?
-                  <Icons.collapse className="h-4 w-4" /> :
-                  <Icons.expand className="h-4 w-4" />
-                }
-              </Button>
-            }
-          >
-            <CardContent>
-              <div className="max-h-[400px] overflow-y-auto pr-2">
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-                  <AnimatedCard className="col-span-1" animation="slide" delay={0.1}>
-                    <CardHeader>
-                      <CardTitle>Audit Summary</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <Textarea readOnly value={auditSummary} className="min-h-[150px] bg-muted text-muted-foreground" />
-                    </CardContent>
-                  </AnimatedCard>
-                  <AnimatedCard className="col-span-1" animation="slide" delay={0.2}>
-                    <CardHeader>
-                      <CardTitle>Correction Suggestions</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <Textarea readOnly value={dataCorrections} className="min-h-[150px] bg-muted text-muted-foreground" />
-                    </CardContent>
-                  </AnimatedCard>
-                  <AnimatedCard className="col-span-1 sm:col-span-2 lg:col-span-1" animation="slide" delay={0.3}>
-                    <CardHeader>
-                      <CardTitle>Detailed Audit Results</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <Textarea readOnly value={auditResults} className="min-h-[150px] bg-muted text-muted-foreground" />
-                    </CardContent>
-                  </AnimatedCard>
-                </div>
-              </div>
-            </CardContent>
-          </AnimatedCardCollapsible>
+        <div className="p-6 pt-0">
+          <Collapsible open={auditSectionOpen} onOpenChange={setAuditSectionOpen} className="w-full">
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between">
+                <CardTitle>Audit Results</CardTitle>
+                <CollapsibleTrigger asChild>
+                  <Button variant="ghost" size="sm">
+                    {auditSectionOpen ? 
+                      <Icons.collapse className="h-4 w-4" /> : 
+                      <Icons.expand className="h-4 w-4" />
+                    }
+                  </Button>
+                </CollapsibleTrigger>
+              </CardHeader>
+              <CollapsibleContent>
+                <CardContent>
+                  <div className="max-h-[400px] overflow-y-auto pr-2">
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                      <Card className="col-span-1">
+                        <CardHeader>
+                          <CardTitle>Audit Summary</CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                          <Textarea readOnly value={auditSummary} className="min-h-[150px] bg-muted text-muted-foreground" />
+                        </CardContent>
+                      </Card>
+                      <Card className="col-span-1">
+                        <CardHeader>
+                          <CardTitle>Correction Suggestions</CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                          <Textarea readOnly value={dataCorrections} className="min-h-[150px] bg-muted text-muted-foreground" />
+                        </CardContent>
+                      </Card>
+                      <Card className="col-span-1">
+                        <CardHeader>
+                          <CardTitle>Detailed Audit Results</CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                          <Textarea readOnly value={auditResults} className="min-h-[150px] bg-muted text-muted-foreground" />
+                        </CardContent>
+                      </Card>
+                    </div>
+                  </div>
+                </CardContent>
+              </CollapsibleContent>
+            </Card>
+          </Collapsible>
         </div>
       )}
 
@@ -1435,23 +1417,14 @@ Suggested actions:
                   <CardDescription>AI-suggested corrections for Indian names</CardDescription>
                 </div>
                 <div className="flex space-x-2">
-                  {/* <Button onClick={applyAllCorrections}>Apply All Corrections</Button> */}
+                  <Button onClick={applyAllCorrections}>Apply All Corrections</Button>
                   <CollapsibleTrigger asChild>
-                    <div className="flex space-x-2">
-                      <AnimatedButton
-                        onClick={applyAllCorrections}
-                        animationMode="bounce"
-                        animationDelay={0.1}
-                      >
-                        Apply All Corrections
-                      </AnimatedButton>
-                      <Button variant="ghost" size="sm">
-                        {correctionSectionOpen ?
-                          <Icons.collapse className="h-4 w-4" /> :
-                          <Icons.expand className="h-4 w-4" />
-                        }
-                      </Button>
-                    </div>
+                    <Button variant="ghost" size="sm">
+                      {correctionSectionOpen ? 
+                        <Icons.collapse className="h-4 w-4" /> : 
+                        <Icons.expand className="h-4 w-4" />
+                      }
+                    </Button>
                   </CollapsibleTrigger>
                 </div>
               </CardHeader>
@@ -1480,14 +1453,13 @@ Suggested actions:
                               {correction.reason}
                             </TableCell>
                             <TableCell>
-                              <AnimatedButton
-                                variant="outline"
-                                size="sm"
+                              <Button 
+                                variant="outline" 
+                                size="sm" 
                                 onClick={() => applyCorrection(correction)}
-                                animationMode="ripple"
                               >
                                 Apply
-                              </AnimatedButton>
+                              </Button>
                             </TableCell>
                           </TableRow>
                         ))}

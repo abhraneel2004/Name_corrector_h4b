@@ -55,14 +55,20 @@ type Data = Record<string, string>;
 
 // Define the expected CSV columns
 const EXPECTED_HEADERS = [
-  "Case No",
+  "Case Title",
+  "Date",
   "Accused First Name",
   "Accused Last Name",
   "Crime",
-  "Location",
-  "Date",
+  "AccusedStatus",
+  "Criminal Location",
   "Police Station",
-  "Inspector In charge"
+  "Inspector In charge",
+  "Last Audit Date",
+  "Last Audit By",
+  "Last Audit Status",
+  "Last Audit Remarks",
+  "Last Audit Location"
 ];
 
 export default function Home() {
@@ -94,7 +100,7 @@ export default function Home() {
   // Error state for handling errors
   const [error, setError] = useState<{title: string, message: string} | null>(null);
 
-  const {toast} = useToast();
+  const { toast } = useToast();
   
   // Effect to handle errors and show toasts
   useEffect(() => {
@@ -159,7 +165,7 @@ export default function Home() {
     } catch (error: any) {
       setError({
         title: 'Error loading files',
-        description: error.message
+        message: error.message
       });
       console.error('Error loading files:', error);
     }
@@ -242,6 +248,7 @@ export default function Home() {
           toast({
             title: 'File uploaded successfully',
             description: `${file.name} has been uploaded and parsed.`,
+            variant: 'success',
           });
           await loadFiles(user.uid); // Reload files after upload
 
@@ -341,6 +348,7 @@ export default function Home() {
         toast({
           title: 'Signed out',
           description: 'You have been signed out.',
+          variant: 'success',
         });
       })
       .catch((error) => {
@@ -456,6 +464,7 @@ export default function Home() {
       toast({
         title: 'Upload successful!',
         description: `Data saved as "${fileName}"`,
+        variant: 'success',
       });
       
       return fileId;
@@ -536,6 +545,7 @@ export default function Home() {
       toast({
         title: 'Download started',
         description: `Downloading ${downloadFilename}`,
+        variant: 'success',
       });
     } catch (error: any) {
       toast({
@@ -560,7 +570,7 @@ export default function Home() {
       const summaryOutput = await provideDataAuditSummary(summaryInput);
       setAuditSummary(summaryOutput.summary);
 
-      // Extract names for corrections (adjust column names as needed)
+      // Extract names for corrections from specific columns
       const nameColumns = ['Accused First Name', 'Accused Last Name', 'Inspector In charge'];
       const namesArray: string[] = [];
       
@@ -621,6 +631,29 @@ export default function Home() {
       
       setCorrectionTable(correctionTableData);
 
+      // Update Last Audit fields when corrections are applied
+      if (correctionTableData.length > 0) {
+        const currentDate = new Date().toISOString().split('T')[0]; // YYYY-MM-DD format
+        
+        setData(prevData => {
+          const newData = [...prevData];
+          correctionTableData.forEach(correction => {
+            if (correction.row > 0) {
+              const rowIndex = correction.row - 1;
+              if (rowIndex < newData.length) {
+                // Update audit metadata
+                newData[rowIndex]["Last Audit Date"] = currentDate;
+                newData[rowIndex]["Last Audit By"] = user?.email || "Anonymous User";
+                newData[rowIndex]["Last Audit Status"] = "Corrected";
+                newData[rowIndex]["Last Audit Remarks"] = `Corrected "${correction.originalValue}" to "${correction.suggestedValue}"`;
+                newData[rowIndex]["Last Audit Location"] = correction.column;
+              }
+            }
+          });
+          return newData;
+        });
+      }
+
     } catch (error: any) {
       // Use setError instead of directly calling toast
       setError({
@@ -637,7 +670,7 @@ export default function Home() {
     }
   };
 
-  // Apply a single correction
+  // Apply a single correction with audit metadata update
   const applyCorrection = useCallback((correction: any) => {
     if (correction?.row && correction?.column) {
       setData(prevData => {
@@ -645,44 +678,65 @@ export default function Home() {
         const rowIndex = correction.row - 1; // Convert from 1-indexed to 0-indexed
         
         if (rowIndex >= 0 && rowIndex < newData.length) {
+          // Apply the correction
           newData[rowIndex][correction.column] = correction.suggestedValue;
+          
+          // Update audit metadata
+          const currentDate = new Date().toISOString().split('T')[0]; // YYYY-MM-DD format
+          newData[rowIndex]["Last Audit Date"] = currentDate;
+          newData[rowIndex]["Last Audit By"] = user?.email || "Anonymous User";
+          newData[rowIndex]["Last Audit Status"] = "Corrected";
+          newData[rowIndex]["Last Audit Remarks"] = `Corrected "${correction.originalValue}" to "${correction.suggestedValue}"`;
+          newData[rowIndex]["Last Audit Location"] = correction.column;
+          
           setModified(true);
           
-          setError({
+          toast({
             title: 'Correction applied',
-            description: `Changed "${correction.originalValue}" to "${correction.suggestedValue}"`
+            description: `Changed "${correction.originalValue}" to "${correction.suggestedValue}"`,
+            variant: 'success',
           });
         }
         
         return newData;
       });
     }
-  }, []);
+  }, [user?.email]);
   
-  // Apply all corrections at once
+  // Apply all corrections at once with audit metadata updates
   const applyAllCorrections = useCallback(() => {
     if (correctionTable.length === 0) return;
     
     setData(prevData => {
       const newData = [...prevData];
+      const currentDate = new Date().toISOString().split('T')[0]; // YYYY-MM-DD format
       
       correctionTable.forEach(correction => {
         const rowIndex = correction.row - 1; // Convert from 1-indexed to 0-indexed
         if (rowIndex >= 0 && rowIndex < newData.length) {
+          // Apply the correction
           newData[rowIndex][correction.column] = correction.suggestedValue;
+          
+          // Update audit metadata
+          newData[rowIndex]["Last Audit Date"] = currentDate;
+          newData[rowIndex]["Last Audit By"] = user?.email || "Anonymous User";
+          newData[rowIndex]["Last Audit Status"] = "Corrected";
+          newData[rowIndex]["Last Audit Remarks"] = `Corrected "${correction.originalValue}" to "${correction.suggestedValue}"`;
+          newData[rowIndex]["Last Audit Location"] = correction.column;
         }
       });
       
       setModified(true);
       
-      setError({
+      toast({
         title: 'All corrections applied',
-        description: `Applied ${correctionTable.length} name corrections`
+        description: `Applied ${correctionTable.length} name corrections`,
+        variant: 'success',
       });
       
       return newData;
     });
-  }, [correctionTable]);
+  }, [correctionTable, user?.email]);
 
   // Render table headers with the expected order
   const renderTableHeaders = () => {
@@ -817,6 +871,7 @@ export default function Home() {
       toast({
         title: 'File loaded',
         description: `${fileData.name} has been loaded.`,
+        variant: 'success',
       });
     } catch (error: any) {
       console.error('Error loading file:', error);
@@ -831,7 +886,7 @@ export default function Home() {
   const testFirebaseConnection = useCallback(async () => {
     setError({
       title: 'Testing Firebase connection...',
-      description: 'Please check console for details.'
+      message: 'Please check console for details.'
     });
     
     console.log("==== FIREBASE CONNECTION TEST ====");
@@ -845,7 +900,7 @@ export default function Home() {
       console.error("Firebase not properly initialized or user not logged in");
       setError({
         title: 'Firebase connection failed',
-        description: 'Please check console for details.'
+        message: 'Please check console for details.'
       });
       return;
     }
@@ -865,15 +920,16 @@ export default function Home() {
       
       console.log("Test document deleted");
       
-      setError({
+      toast({
         title: 'Firebase connection successful',
-        description: 'Successfully created and deleted a test document.'
+        description: 'Successfully created and deleted a test document.',
+        variant: 'success',
       });
     } catch (error: any) {
       console.error("Firebase test failed:", error);
       setError({
         title: 'Firebase test failed',
-        description: error.message || 'An error occurred while testing the connection.'
+        message: error.message || 'An error occurred while testing the connection.'
       });
     }
   }, [db, user, firebaseConfig, firebaseApp, auth]);

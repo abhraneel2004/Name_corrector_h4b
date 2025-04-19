@@ -49,6 +49,7 @@ export function SignIn() {
       toast({
         title: 'Success',
         description: 'Signed in successfully!',
+        variant: 'success',
       });
       router.push('/');
     } catch (error: any) {
@@ -70,6 +71,7 @@ export function SignIn() {
       toast({
         title: 'Success',
         description: 'Signed in with Google successfully!',
+        variant: 'success',
       });
       router.push('/');
     } catch (error: any) {
@@ -90,6 +92,7 @@ export function SignIn() {
       toast({
         title: 'Success',
         description: 'Signed in as guest!',
+        variant: 'success',
       });
       router.push('/');
     } catch (error: any) {

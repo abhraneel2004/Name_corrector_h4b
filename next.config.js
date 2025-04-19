@@ -2,11 +2,11 @@
 const nextConfig = {
   /* config options here */
   typescript: {
+    // Don't fail the build on TypeScript errors
     ignoreBuildErrors: true,
-    // Ignore issues with external packages
-    tsconfigPath: "./tsconfig.json",
   },
   eslint: {
+    // Don't fail the build on ESLint errors
     ignoreDuringBuilds: true,
   },
   // Tell webpack to exclude these Node.js core modules in browser builds
@@ -46,6 +46,11 @@ const nextConfig = {
       });
     }
 
+    // Suppress errors when node_modules has tsconfig issues
+    config.infrastructureLogging = {
+      level: 'error',
+    };
+
     return config;
   },
   
@@ -54,6 +59,7 @@ const nextConfig = {
     '@opentelemetry',
     'genkit',
     '@genkit-ai/googleai',
+    '@genkit-ai/next',
   ],
   
   // Ignores node_modules files to prevent issues with external packages

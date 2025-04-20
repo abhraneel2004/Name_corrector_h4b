@@ -1341,7 +1341,7 @@ Suggested actions:
                   <Icons.download className="mr-2 h-4 w-4" />
                   Download
                 </AnimatedButton>
-                <AnimatedButton
+                {/* <AnimatedButton
                   onClick={extractAndNavigateToCrimeData}
                   disabled={data.length === 0}
                   variant="default"
@@ -1350,7 +1350,7 @@ Suggested actions:
                 >
                   <Icons.barChart className="mr-2 h-4 w-4" />
                   Analyze Crimes
-                </AnimatedButton>
+                </AnimatedButton> */}
               </div>
             </div>
           </CardContent>

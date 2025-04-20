@@ -1,5 +1,6 @@
 import {
   ArrowRight,
+  BarChart,
   Check,
   ChevronsUpDown,
   ChevronDown,
@@ -38,6 +39,7 @@ import {
 
 const Icons = {
   arrowRight: ArrowRight,
+  barChart: BarChart,
   check: Check,
   chevronDown: ChevronsUpDown,
   chevronUp: ChevronUp,

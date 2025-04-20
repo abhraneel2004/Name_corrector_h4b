@@ -4,6 +4,7 @@ import { Icons } from '@/components/icons';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { User } from 'firebase/auth';
+import Link from 'next/link';
 
 interface NavBarProps {
   user: User | null;
@@ -23,9 +24,9 @@ export function NavBar({
   return (
     <header className="bg-card border-b border-border p-4 flex justify-between items-center">
       <div className="flex items-center space-x-3">
-        <div className="rounded-md">
+        <Link href="/" className="rounded-md">
           <img src="./long_logo.png" alt="Logo" className="h-20 w-88" />
-        </div>
+        </Link>
       </div>
       <div className="flex items-center space-x-4">
         <div className="flex flex-col items-end mr-2 hidden sm:flex">

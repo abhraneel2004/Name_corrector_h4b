@@ -124,6 +124,29 @@ export const AnimatedCounter = ({
   );
 };
 
+// Animated table row - specifically for <tr> elements
+export const AnimatedTableRow = ({
+  children,
+  index = 0,
+  className = "",
+}: {
+  children: React.ReactNode;
+  index?: number;
+  className?: string;
+}) => {
+  return (
+    <motion.tr
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={{ delay: index * 0.05, duration: 0.3 }}
+      className={className}
+    >
+      {children}
+    </motion.tr>
+  );
+};
+
 // Animated list item - use with map() for lists
 export const AnimatedListItem = ({
   children,
@@ -157,9 +180,9 @@ export const HoverCard = ({
 }) => {
   return (
     <motion.div
-      whileHover={{ 
-        scale: 1.02, 
-        boxShadow: "0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)" 
+      whileHover={{
+        scale: 1.02,
+        boxShadow: "0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)"
       }}
       transition={{ duration: 0.2 }}
       className={className}

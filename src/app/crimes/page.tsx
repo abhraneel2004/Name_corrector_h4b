@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { NavBar } from '@/components/navbar';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
@@ -31,7 +31,8 @@ type CrimeData = {
   rows: number[];
 };
 
-export default function CrimesPage() {
+// Create a wrapper component that uses useSearchParams inside Suspense
+function CrimesContent() {
   const [mounted, setMounted] = useState(false);
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState<any>(null);
@@ -319,5 +320,14 @@ Present your analysis in a clear, organized format suitable for legal profession
 
       <Toaster />
     </div>
+  );
+}
+
+// Main component that wraps the content with Suspense
+export default function CrimesPage() {
+  return (
+    <Suspense fallback={<Loading />}>
+      <CrimesContent />
+    </Suspense>
   );
 }

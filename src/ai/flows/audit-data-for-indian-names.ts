@@ -4,7 +4,7 @@
 
 import {ai, logGeminiAPICall} from '@/ai/ai-instance';
 import {validateIndianName, batchValidateIndianNames} from '@/services/indian-name-validator-server';
-import {z} from 'genkit';
+import {z} from 'zod';
 
 const AuditDataForIndianNamesInputSchema = z.object({
   data: z

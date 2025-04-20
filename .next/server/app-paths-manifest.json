@@ -1,11 +1,6 @@
 {
   "/favicon.ico/route": "app/favicon.ico/route.js",
-  "/api/route": "app/api/route.js",
-  "/_not-found/page": "app/_not-found/page.js",
-  "/crimes/page": "app/crimes/page.js",
-  "/signin/page": "app/signin/page.js",
   "/page": "app/page.js",
-  "/signup/page": "app/signup/page.js",
-  "/test-validator/page": "app/test-validator/page.js",
-  "/validator/page": "app/validator/page.js"
+  "/signin/page": "app/signin/page.js",
+  "/signup/page": "app/signup/page.js"
 }

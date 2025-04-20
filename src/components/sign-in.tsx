@@ -7,6 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
 import { Icons } from '@/components/icons';
+import Link from 'next/link';
 import {
   Card,
   CardContent,
@@ -111,13 +112,11 @@ export function SignIn() {
       {/* Left side decorative panel */}
       <div className="hidden md:flex md:w-1/2 bg-gradient-to-br from-primary/20 to-primary/5 flex-col justify-center items-center p-12">
         <div className="max-w-md text-center">
-          <div className="mb-8 flex justify-center">
-            <Icons.file className="h-20 w-20 text-primary" />
+          <div className="flex items-center space-x-3">
+            <Link href="/" className="rounded-md">
+              <img src="./long_logo.png" alt="Logo" className="h-20 w-88" />
+            </Link>
           </div>
-          <h1 className="text-4xl font-bold tracking-tight mb-6">Indian Name Corrector</h1>
-          <p className="text-xl text-muted-foreground mb-4">
-            Clean and validate Indian names in your datasets with AI-powered suggestions.
-          </p>
           <div className="mt-12 grid grid-cols-1 gap-4 text-left">
             <div className="flex items-start space-x-4">
               <div className="bg-primary/10 p-2 rounded-full">

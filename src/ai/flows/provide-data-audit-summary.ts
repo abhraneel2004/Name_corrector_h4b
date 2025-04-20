@@ -8,7 +8,7 @@
  */
 
 import {ai} from '@/ai/ai-instance';
-import {z} from 'genkit';
+import {z} from 'zod';
 
 const ProvideDataAuditSummaryInputSchema = z.object({
   auditResults: z.string().describe('The detailed results from the data audit.'),
@@ -43,10 +43,7 @@ const prompt = ai.definePrompt({
   \n  Summary: `,
 });
 
-const provideDataAuditSummaryFlow = ai.defineFlow<
-  typeof ProvideDataAuditSummaryInputSchema,
-  typeof ProvideDataAuditSummaryOutputSchema
->(
+const provideDataAuditSummaryFlow = ai.defineFlow(
   {
     name: 'provideDataAuditSummaryFlow',
     inputSchema: ProvideDataAuditSummaryInputSchema,

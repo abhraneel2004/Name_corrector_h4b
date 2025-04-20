@@ -8,7 +8,7 @@
  */
 
 import {ai, logGeminiAPICall} from '@/ai/ai-instance';
-import {z} from 'genkit';
+import {z} from 'zod';
 
 // Define the name correction type
 interface NameCorrection {
@@ -108,6 +108,110 @@ IMPORTANT RULES:
 - Maintain the same general structure of the name unless there's a clear error
 - Do not change naming conventions across regions (South Indian vs North Indian naming patterns)
 
+Wrong Names Example:
+    "Mohammed Shiv", // Mixing Muslim and Hindu names
+    "Mohammed Singh", // Mixing Muslim and Sikh names
+    "Arjun Patel-Singh", // Mixing Gujarati and Sikh surnames
+    "Mohammed Sharma", // Muslim first name with Hindu Brahmin surname
+    "Lakshmi Khan", // Hindu goddess name with Muslim surname
+    "Gurpreet Iyer", // Sikh first name with South Indian surname
+    "Raj O'Malley", // Indian first name with Irish surname
+    "Samir Nakamura", // Arab/Indian first name with Japanese surname
+    "Indira Zhang", // Indian first name with Chinese surname
+    "Vikram Cohen", // Indian first name with Jewish surname
+    "Sanjay McDonald", // Indian first name with Scottish surname
+    "Ananya Kowalski", // Indian first name with Polish surname
+    "Nikhil Suzuki", // Indian first name with Japanese surname
+    "Priya Rossi", // Indian first name with Italian surname
+    "Rahul von Schmidt", // Indian first name with German surname
+    "Deepika Papadopoulos", // Indian first name with Greek surname
+    "Amit Rodriguez", // Indian first name with Hispanic surname
+    "Kiran O'Brien", // Indian first name with Irish surname
+    "Aditya Kim", // Indian first name with Korean surname
+    "Simran Dubois", // Sikh first name with French surname
+    "Rohan Svensson", // Indian first name with Swedish surname
+    "Neha Kowalczyk", // Indian first name with Polish surname
+    "Sikh Brahmin", // Religious identity used as name with caste as surname
+    "Hindu Muslim", // Religious identities used as name and surname
+    "South North", // Directional terms used as names
+    "Punjabi Bengali", // Regional identities used as names
+    "Rajesh McGupta", // Mixed Western-Indian surname with prefix
+    "Abdul Chatterjee", // Muslim first name with Bengali Hindu surname
+    "Krishna Qureshi", // Hindu deity name with Muslim surname
+    "Sikh Iyer", // Religious identity with South Indian Brahmin surname
+    "Fatima Joshi", // Muslim first name with Hindu surname
+    "Jesus Singh", // Christian first name with Sikh surname
+    "Gurpreet Mukherjee", // Sikh first name with Bengali Hindu surname
+    "Buddha Patel", // Religious figure with Gujarati surname
+    "Maharashtra Karnataka", // Indian states used as names
+    "Sundar Gandhi-Nehru", // Hyphenated historically significant surnames
+    "Tamil Telugu", // Language groups used as names
+    "Parvati Muhammad", // Hindu goddess name with Muslim male name as surname
+    "Bismillah Rao", // Islamic phrase with South Indian Hindu suffix
+    "Aryan Dravidian", // Ancient racial classifications used as names
+    "Jain Buddhist", // Religious identities used as names
+    "Veda Quran", // Religious texts used as names
+    "Ganesh Christ", // Religious figures used as names
+    "Delhi Mumbai", // City names used as names
+    "Chapati Biryani", // Food items used as names
+    "Himalaya Rajput", // Geographical feature with caste name
+    "Sari Kurta", // Clothing items used as names
+    "Rupee Dollar", // Currency names used as names
+    "Brahma Mohammed", // Hindu god with Muslim prophet name
+    "Punjabi Sharma", // Regional identity with caste surname
+    "Navratri Ramadan", // Festival names used as names
+    "Yoga Namaz", // Religious practices used as names
+    "Om Allah", // Religious symbols/terms from different religions
+    "Shiva Jesus", // Religious figures from different religions
+    "Ganga Thames", // River names from different countries
+    "Bollywood Hollywood", // Film industries used as names
+    "Taj Mahal Empire", // Monument with political term
+    "Sitar Guitar", // Musical instruments used as names
+    "Karma Hajj", // Religious concepts from different traditions
+    "Ayurvedic Halal", // Medical system with religious dietary term
+    "Sati Jihad", // Religious practices from different traditions
+    "Pandit Sheikh", // Religious titles from different traditions
+    "Swami Rabbi", // Religious titles from different traditions
+    "Dharma Sharia", // Religious concepts from different traditions
+    "Vishnu Mohammad", // Hindu god with Muslim name
+    "Krishna Pastor", // Hindu deity with Christian religious title
+    "Ravi Abdullah", // Hindu name with Muslim name
+    "Suresh Ben Patel", // Hindu name with Jewish prefix
+    "Manu Darwin", // Hindu lawgiver with Western scientist surname
+    "Vedic Einstein", // Religious adjective with Western surname
+    "Ramayan Bible", // Religious texts used as names
+    "Mosque Temple", // Religious buildings used as names
+    "Ganesha Cardinal", // Hindu deity with Catholic religious title
+    "Prasad Communion", // Hindu religious offering with Christian sacrament
+    "Bharat America", // Country names used as names
+    "Gurmeet von Chatterjee", // Sikh name with German nobility prefix and Bengali surname
+    "Fatima O'Sharma", // Muslim first name with Irish-Hindu hybrid surname
+    "Abdullah Das Gupta", // Muslim name with Bengali Hindu surname
+    "Pope Shankaracharya", // Catholic and Hindu religious titles
+    "Ayatollah Swami", // Shia Muslim and Hindu religious titles
+    "Zakir Nataraj", // Muslim name with Hindu god of dance
+    "Rishi Mullah", // Hindu sage title with Muslim religious title
+    "Vande Mataram Khan", // Indian national song with Muslim surname
+    "Jihad Ahimsa", // Islamic struggle concept with Hindu non-violence concept
+    "Namaste Salaam", // Hindu and Muslim greetings used as names
+    "Shakti Power", // Sanskrit word with English translation as surname
+    "Madrasa Gurukul", // Islamic and Hindu educational institutions
+    "Bhagavad Quran", // Hindu text with part of Islamic text title
+    "Mohammed Brahmaputra", // Muslim name with Indian river
+    "Abdul Ganga", // Muslim name with Hindu sacred river
+    "Ali Hanuman", // Muslim name with Hindu deity
+    "Guru Mecca", // Sikh religious title with Islamic holy city
+    "Varanasi Jeddah", // Hindu and Muslim holy cities
+    "Bajrangi Sultan", // Hindu deity epithet with Muslim royal title
+    "Lotus Crescent", // Hindu and Muslim religious symbols
+    "Amrit Zamzam", // Sikh holy water with Islamic holy water
+    "Bhindranwale Gandhi", // Controversial Sikh figure with iconic Indian surname
+    "Jinnah Nehru", // Pakistani and Indian political leaders
+    "Ram Rahim Khan", // Hindu deity with Muslim prophet and surname
+    "Nanak Mohammed", // Sikh guru with Muslim prophet name
+    "Bharat Pakistan", // Country names used as name and surname
+    "Modi Bhutto" 
+
 Input JSON:
 {{{namesJson}}}
 
@@ -130,10 +234,7 @@ const suggestDataCorrectionsFlowSchema = z.object({
   namesJson: z.string().describe('JSON string containing an array of Indian names.'),
 });
 
-const suggestDataCorrectionsFlow = ai.defineFlow<
-  typeof suggestDataCorrectionsFlowSchema,
-  typeof SuggestDataCorrectionsOutputSchema
->(
+const suggestDataCorrectionsFlow = ai.defineFlow(
   {
     name: 'suggestDataCorrectionsFlow',
     inputSchema: suggestDataCorrectionsFlowSchema,

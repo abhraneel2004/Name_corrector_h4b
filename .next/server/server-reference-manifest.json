@@ -1,1 +1,39 @@
-{"node":{"40d6f180d7cca0fdb28f677d8f3607522ed5631e2b":{"workers":{"app/page":{"moduleId":"20297","async":false}},"layer":{"app/page":"action-browser"}},"4097c3e90d3e0b3ce78b7010d6bba5f062cdb6c9bf":{"workers":{"app/page":{"moduleId":"20297","async":false}},"layer":{"app/page":"action-browser"}},"4081c848582dbda193a58b1d2a7554782d91fed434":{"workers":{"app/page":{"moduleId":"20297","async":false}},"layer":{"app/page":"action-browser"}}},"edge":{},"encryptionKey":"GPLiD2O0EEMoqOTW3kdk4uR4ibjdrlYkGP2eDufhVqA="}
+{
+  "node": {
+    "4042a38bd021d9bb2bf44d2c43e4e83fe423635b94": {
+      "workers": {
+        "app/page": {
+          "moduleId": "[project]/.next-internal/server/app/page/actions.js { ACTIONS_MODULE0 => \"[project]/src/ai/flows/audit-data-for-indian-names.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/src/ai/flows/provide-data-audit-summary.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE2 => \"[project]/src/ai/flows/suggest-data-corrections.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
+          "async": false
+        }
+      },
+      "layer": {
+        "app/page": "action-browser"
+      }
+    },
+    "4007e5accce42cca0204ff6cce7f485cf5cce1023f": {
+      "workers": {
+        "app/page": {
+          "moduleId": "[project]/.next-internal/server/app/page/actions.js { ACTIONS_MODULE0 => \"[project]/src/ai/flows/audit-data-for-indian-names.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/src/ai/flows/provide-data-audit-summary.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE2 => \"[project]/src/ai/flows/suggest-data-corrections.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
+          "async": false
+        }
+      },
+      "layer": {
+        "app/page": "action-browser"
+      }
+    },
+    "40158b65749de08c45c9558d98fa57ebb39e29e5e0": {
+      "workers": {
+        "app/page": {
+          "moduleId": "[project]/.next-internal/server/app/page/actions.js { ACTIONS_MODULE0 => \"[project]/src/ai/flows/audit-data-for-indian-names.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/src/ai/flows/provide-data-audit-summary.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE2 => \"[project]/src/ai/flows/suggest-data-corrections.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
+          "async": false
+        }
+      },
+      "layer": {
+        "app/page": "action-browser"
+      }
+    }
+  },
+  "edge": {},
+  "encryptionKey": "GPLiD2O0EEMoqOTW3kdk4uR4ibjdrlYkGP2eDufhVqA="
+}

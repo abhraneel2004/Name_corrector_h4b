@@ -1,6 +1,6 @@
-// Import using require as a workaround
-const genkit = require('genkit');
-const { googleAI } = require('@genkit-ai/googleai');
+// Use ESM import syntax with named imports
+import { genkit } from 'genkit';
+import { googleAI } from '@genkit-ai/googleai';
 
 /**
  * Logger function for Gemini API calls

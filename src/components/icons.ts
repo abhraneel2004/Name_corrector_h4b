@@ -8,6 +8,8 @@ import {
   Circle,
   Copy,
   Edit,
+  Eye,
+  EyeOff,
   ExternalLink,
   File,
   HelpCircle,
@@ -34,7 +36,8 @@ import {
   Globe,
   Twitter,
   Github,
-  Linkedin
+  Linkedin,
+  ChartBar
 } from 'lucide-react';
 
 const Icons = {
@@ -52,6 +55,8 @@ const Icons = {
   dark: Moon,
   download: Download,
   edit: Edit,
+  eye: Eye,
+  eyeOff: EyeOff,
   externalLink: ExternalLink,
   file: File,
   github: Github,
@@ -77,7 +82,8 @@ const Icons = {
   trash: Trash,
   twitter: Twitter,
   user: User,
-  alertTriangle: AlertTriangle
+  alertTriangle: AlertTriangle,
+  chart: ChartBar
 };
 
 export {Icons};

@@ -1139,6 +1139,61 @@ Suggested actions:
     setIsQuerying(false);
   };
 
+  // Add this function to the Home component:
+  const extractAndNavigateToCrimeData = useCallback(() => {
+    if (data.length === 0) {
+      toast({
+        title: 'No data available',
+        description: 'Please load data before analyzing crimes',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    try {
+      // Extract crime data from the "Crime" column
+      const crimeMap = new Map<string, { count: number, caseIds: string[], rows: number[] }>();
+
+      data.forEach((row, index) => {
+        const crime = row['Crime'] || 'Unknown';
+        const caseId = row['Case Title'] || `Case-${index}`;
+
+        if (!crimeMap.has(crime)) {
+          crimeMap.set(crime, { count: 0, caseIds: [], rows: [] });
+        }
+
+        const crimeData = crimeMap.get(crime)!;
+        crimeData.count += 1;
+        crimeData.caseIds.push(caseId);
+        crimeData.rows.push(index + 1); // 1-indexed for display
+      });
+
+      // Convert map to array and sort by count (descending)
+      const crimeStats = Array.from(crimeMap.entries()).map(([crime, data]) => ({
+        crime,
+        count: data.count,
+        caseIds: data.caseIds,
+        rows: data.rows
+      })).sort((a, b) => b.count - a.count);
+
+      // Prepare data for URL parameters
+      const crimeDataParam = encodeURIComponent(JSON.stringify(crimeStats));
+      const filenameParam = encodeURIComponent(filename || 'Untitled Data');
+      const totalParam = data.length.toString();
+
+      // Navigate to the crimes page with the data
+      router.push(`/crimes?crimeData=${crimeDataParam}&filename=${filenameParam}&total=${totalParam}`);
+
+    } catch (error: any) {
+      console.error('Error processing crime data:', error);
+      toast({
+        title: 'Error processing crime data',
+        description: error.message || 'An unexpected error occurred',
+        variant: 'destructive',
+      });
+    }
+  }, [data, filename, router, toast]);
+
   // Show loading state while checking authentication
   if (!mounted || loading) {
     return <Loading />;
@@ -1283,6 +1338,16 @@ Suggested actions:
                 <AnimatedButton onClick={handleDownloadData} disabled={data.length === 0} variant="outline">
                   <Icons.download className="mr-2 h-4 w-4" />
                   Download
+                </AnimatedButton>
+                <AnimatedButton
+                  onClick={extractAndNavigateToCrimeData}
+                  disabled={data.length === 0}
+                  variant="default"
+                  className="bg-purple-600 hover:bg-purple-700"
+                  animationMode="pulse"
+                >
+                  <Icons.barChart className="mr-2 h-4 w-4" />
+                  Analyze Crimes
                 </AnimatedButton>
               </div>
             </div>

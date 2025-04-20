@@ -1,5 +1,6 @@
 // Use ESM import syntax with named imports
-import { genkit } from 'genkit';
+// import { genkit } from 'genkit';
+const { genkit } = require('genkit');
 import { googleAI } from '@genkit-ai/googleai';
 
 /**

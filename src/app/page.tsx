@@ -380,13 +380,15 @@ export default function Home() {
   };
 
   const handleDeleteRow = (index: number) => {
-    AlertDialog({ children: 'Are you sure you want to delete this row?' });
-    setData(prevData => {
-      const newData = [...prevData];
-      newData.splice(index, 1);
-      setModified(true);
-      return newData;
-    });
+    // Use the browser's built-in confirmation dialog instead of trying to use AlertDialog as a function
+    if (confirm('Are you sure you want to delete this row?')) {
+      setData(prevData => {
+        const newData = [...prevData];
+        newData.splice(index, 1);
+        setModified(true);
+        return newData;
+      });
+    }
   };
 
   const handleSend = () => {

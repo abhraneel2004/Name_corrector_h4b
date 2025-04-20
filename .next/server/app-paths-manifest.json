@@ -1,6 +1,12 @@
 {
+  "/api/gemini/route": "app/api/gemini/route.js",
   "/favicon.ico/route": "app/favicon.ico/route.js",
+  "/_not-found/page": "app/_not-found/page.js",
   "/page": "app/page.js",
+  "/crimes/page": "app/crimes/page.js",
+  "/signup/page": "app/signup/page.js",
   "/signin/page": "app/signin/page.js",
-  "/signup/page": "app/signup/page.js"
+  "/test-validator/page": "app/test-validator/page.js",
+  "/validator/page": "app/validator/page.js",
+  "/api/route": "app/api/route.js"
 }

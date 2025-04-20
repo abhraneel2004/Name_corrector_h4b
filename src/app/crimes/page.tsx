@@ -132,23 +132,22 @@ function CrimesContent() {
         throw new Error('No API key found for Google Gemini');
       }
 
-      // Extract crime names for analysis
-      const crimes = crimeStats.map(stat => stat.crime);
+      // Extract crime names for analysis - limit to top 5 most frequent crimes to avoid timeout
+      const topCrimes = crimeStats.slice(0, 5).map(stat => stat.crime);
 
-      // Create a prompt for Gemini
+      // Create a simpler prompt for Gemini
       const prompt = `
 You are a legal expert specializing in criminal law in India.
 
-Please provide a detailed analysis of the following crimes from the Indian Penal Code:
-${crimes.join(', ')}
+Please provide a concise analysis of the following top ${topCrimes.length} crimes from the dataset:
+${topCrimes.join(', ')}
 
-For each crime, please include:
-1. The definition of the crime under Indian law
-2. The typical penalties or sentences associated with this crime
-3. The relevant section(s) of the Indian Penal Code
-4. Any notable case precedents
+For each crime, include:
+1. Brief definition under Indian law
+2. The relevant section of the Indian Penal Code
+3. Typical penalties
 
-Present your analysis in a clear, organized format suitable for legal professionals. also use html tags to format the output.
+Use simple HTML formatting (<h3>, <p>, <ul>, <li>) for readability.
 `;
 
       // Call the Gemini API via our server-side proxy API route
@@ -171,7 +170,7 @@ Present your analysis in a clear, organized format suitable for legal profession
             temperature: 0.2,
             topK: 40,
             topP: 0.8,
-            maxOutputTokens: 4096
+            maxOutputTokens: 2048
           }
         })
       });
@@ -183,7 +182,18 @@ Present your analysis in a clear, organized format suitable for legal profession
       const responseData = await response.json();
 
       if (responseData.candidates && responseData.candidates[0]?.content?.parts[0]?.text) {
-        setCrimeAnalysis(responseData.candidates[0].content.parts[0].text);
+        const analysisText = responseData.candidates[0].content.parts[0].text;
+        setCrimeAnalysis(analysisText);
+
+        // If there are more crimes not analyzed, add a note
+        if (crimeStats.length > 5) {
+          const noteHtml = `<div class="mt-4 p-2 bg-yellow-100 dark:bg-yellow-900 rounded">
+            <p><strong>Note:</strong> Analysis limited to top 5 crimes to prevent timeout. 
+            ${crimeStats.length - 5} additional crime types are not included in this analysis.</p>
+          </div>`;
+          setCrimeAnalysis(analysisText + noteHtml);
+        }
+
         toast({
           title: 'Analysis complete',
           description: 'Crime analysis has been generated successfully.',

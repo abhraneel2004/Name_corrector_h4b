@@ -27,5 +27,3 @@ export function geminiErrorMessage(status: number): string {
   if (status === 503) return 'The AI service is busy. Try again in a minute.';
   return `The AI request failed (status ${status}).`;
 }
-
-// this is an added comment

@@ -22,7 +22,9 @@ import {
   signInWithPopup,
 } from 'firebase/auth';
 import { auth } from '@/lib/firebase';
-import { signInAnonymously } from '@/lib/auth-utils';
+import { sendVerificationEmail } from '@/lib/auth-email';
+import { PASSWORD_POLICY_MESSAGE, passwordMeetsPolicy } from '@/lib/password-policy';
+import { PasswordChecklist } from '@/components/password-checklist';
 
 export function SignUp() {
   const [email, setEmail] = useState('');
@@ -46,10 +48,10 @@ export function SignUp() {
       return;
     }
 
-    if (password.length < 6) {
+    if (!passwordMeetsPolicy(password)) {
       toast({
-        title: 'Error',
-        description: 'Password should be at least 6 characters long',
+        title: 'Password too weak',
+        description: PASSWORD_POLICY_MESSAGE,
         variant: 'destructive',
       });
       return;
@@ -57,17 +59,20 @@ export function SignUp() {
 
     setLoading(true);
     try {
-      await createUserWithEmailAndPassword(auth, email, password);
+      const { user } = await createUserWithEmailAndPassword(auth, email, password);
+      // The console requires a verified email; the verify screen lets the user resend if this fails
+      await sendVerificationEmail(user).catch(() => {});
       toast({
-        title: 'Success',
-        description: 'Account created successfully!',
+        title: 'Account created',
+        description: `We sent a verification link to ${email}.`,
         variant: 'success',
       });
-      router.push('/');
+      router.push('/app');
     } catch (error: any) {
       toast({
         title: 'Error',
-        description: error.message,
+        description:
+          error?.code === 'auth/password-does-not-meet-requirements' ? PASSWORD_POLICY_MESSAGE : error.message,
         variant: 'destructive',
       });
     } finally {
@@ -85,28 +90,7 @@ export function SignUp() {
         description: 'Signed in with Google successfully!',
         variant: 'success',
       });
-      router.push('/');
-    } catch (error: any) {
-      toast({
-        title: 'Error',
-        description: error.message,
-        variant: 'destructive',
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleAnonymousSignIn = async () => {
-    setLoading(true);
-    try {
-      await signInAnonymously();
-      toast({
-        title: 'Success',
-        description: 'Signed in as guest!',
-        variant: 'success',
-      });
-      router.push('/');
+      router.push('/app');
     } catch (error: any) {
       toast({
         title: 'Error',
@@ -119,41 +103,44 @@ export function SignUp() {
   };
 
   return (
-    <div className="flex bg-gradient-to-b from-primary/5 via-background to-background">
+    <div className="flex flex-1 bg-background">
       {/* Left side decorative panel */}
-      <div className="hidden md:flex md:w-1/2 bg-gradient-to-br from-primary/20 to-primary/5 flex-col justify-center items-center p-12">
-        <div className="max-w-md text-center">
+      <div className="hidden md:flex md:w-1/2 flex-col justify-center items-center border-r bg-card p-12">
+        <div className="w-full max-w-md">
           <div className="flex items-center space-x-3">
             <Link href="/" className="rounded-md">
-              <img src="./long_logo.png" alt="Logo" className="h-20 w-88" />
+              <img src="/long_logo.png" alt="Logo" className="h-12 w-auto" />
             </Link>
           </div>
-          <div className="mt-12 grid grid-cols-1 gap-4 text-left">
+          <p className="eyebrow mt-10">Records Audit Console</p>
+          <h1 className="mt-2 text-2xl font-semibold tracking-tight">Accurate case records, verified at source.</h1>
+          <p className="mt-3 text-sm text-muted-foreground">Audit and standardise names across police case files with AI-assisted review.</p>
+          <div className="mt-10 grid grid-cols-1 gap-5 border-t pt-8 text-left">
             <div className="flex items-start space-x-4">
-              <div className="bg-primary/10 p-2 rounded-full">
-                <Icons.check className="h-5 w-5 text-primary" />
+              <div className="rounded-sm border bg-background p-1.5">
+                <Icons.check className="h-3.5 w-3.5 text-primary" />
               </div>
               <div>
-                <h3 className="font-medium">Secure Cloud Storage</h3>
-                <p className="text-sm text-muted-foreground">Your data is securely stored and accessible anywhere</p>
+                <h3 className="text-[13px] font-medium">Secure Cloud Storage</h3>
+                <p className="text-xs text-muted-foreground">Your data is securely stored and accessible anywhere</p>
               </div>
             </div>
             <div className="flex items-start space-x-4">
-              <div className="bg-primary/10 p-2 rounded-full">
-                <Icons.check className="h-5 w-5 text-primary" />
+              <div className="rounded-sm border bg-background p-1.5">
+                <Icons.check className="h-3.5 w-3.5 text-primary" />
               </div>
               <div>
-                <h3 className="font-medium">Easy Data Management</h3>
-                <p className="text-sm text-muted-foreground">Upload, manage, and export your datasets seamlessly</p>
+                <h3 className="text-[13px] font-medium">Easy Data Management</h3>
+                <p className="text-xs text-muted-foreground">Upload, manage, and export your datasets seamlessly</p>
               </div>
             </div>
             <div className="flex items-start space-x-4">
-              <div className="bg-primary/10 p-2 rounded-full">
-                <Icons.check className="h-5 w-5 text-primary" />
+              <div className="rounded-sm border bg-background p-1.5">
+                <Icons.check className="h-3.5 w-3.5 text-primary" />
               </div>
               <div>
-                <h3 className="font-medium">AI-Powered Analysis</h3>
-                <p className="text-sm text-muted-foreground">Get detailed insights and reports on your data</p>
+                <h3 className="text-[13px] font-medium">AI-Powered Analysis</h3>
+                <p className="text-xs text-muted-foreground">Get detailed insights and reports on your data</p>
               </div>
             </div>
           </div>
@@ -162,13 +149,13 @@ export function SignUp() {
 
       {/* Right side sign up form */}
       <div className="flex-1 flex items-center justify-center p-6">
-        <Card className="w-full max-w-md shadow-xl">
-          <CardHeader className="space-y-1">
-            <div className="flex justify-center md:hidden mb-6">
-              <Icons.file className="h-12 w-12 text-primary" />
+        <Card className="w-full max-w-sm">
+          <CardHeader className="space-y-1.5">
+            <div className="flex md:hidden mb-4">
+              <img src="/long_logo.png" alt="Logo" className="h-9 w-auto" />
             </div>
-            <CardTitle className="text-3xl font-bold text-center">Create Account</CardTitle>
-            <CardDescription className="text-center">
+            <CardTitle className="text-lg font-semibold">Create Account</CardTitle>
+            <CardDescription>
               Sign up to get started with Indian Name Corrector
             </CardDescription>
           </CardHeader>
@@ -215,9 +202,7 @@ export function SignUp() {
                     </span>
                   </Button>
                 </div>
-                <p className="text-xs text-muted-foreground">
-                  Password must be at least 6 characters long
-                </p>
+                <PasswordChecklist password={password} />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="confirmPassword">Confirm Password</Label>
@@ -270,7 +255,7 @@ export function SignUp() {
                 <div className="w-full border-t border-border" />
               </div>
               <div className="relative flex justify-center text-xs uppercase">
-                <span className="px-2 bg-card text-muted-foreground">Or continue with</span>
+                <span className="px-2 bg-card text-[11px] tracking-[0.08em] text-muted-foreground">Or continue with</span>
               </div>
             </div>
 
@@ -283,15 +268,6 @@ export function SignUp() {
               >
                 <Icons.google className="mr-2 h-4 w-4" />
                 Google
-              </Button>
-              <Button
-                variant="outline"
-                onClick={handleAnonymousSignIn}
-                disabled={loading}
-                className="w-full"
-              >
-                <Icons.user className="mr-2 h-4 w-4" />
-                Continue as Guest
               </Button>
             </div>
           </CardContent>

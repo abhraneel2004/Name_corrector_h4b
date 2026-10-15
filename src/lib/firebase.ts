@@ -16,9 +16,7 @@ const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApps()[0
 const auth = getAuth(app);
 const db = getFirestore(app);
 
-// NOTE: Make sure to enable Anonymous authentication in Firebase Console:
-// 1. Go to Firebase Console > Authentication > Sign-in method
-// 2. Enable "Anonymous" provider
-// This is required for the "Continue as Guest" functionality
+// Guest (anonymous) access is not supported: the server and Firestore rules require a verified email.
+// Keep the "Anonymous" provider disabled in Firebase Console > Authentication > Sign-in method.
 
 export { app, auth, db }; 

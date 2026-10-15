@@ -64,7 +64,7 @@ export const AnimatedButton = React.forwardRef<HTMLButtonElement, AnimatedButton
     };
 
     // Handle ripple effect
-    const handleRipple = (e: React.MouseEvent) => {
+    const handleRipple = (e: React.MouseEvent<HTMLButtonElement>) => {
       if (animationMode === "ripple") {
         setIsRippling(true);
         setTimeout(() => setIsRippling(false), 600);

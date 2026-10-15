@@ -61,9 +61,9 @@ export default function ValidatorPage() {
   };
 
   const getConfidenceColor = (confidence: number) => {
-    if (confidence >= 80) return 'text-green-500';
-    if (confidence >= 50) return 'text-yellow-500';
-    return 'text-red-500';
+    if (confidence >= 80) return 'text-success';
+    if (confidence >= 50) return 'text-warning';
+    return 'text-destructive';
   };
 
   return (
@@ -143,7 +143,7 @@ export default function ValidatorPage() {
                       <div className="text-sm font-medium text-muted-foreground mb-2">Issues Found</div>
                       <ul className="list-disc pl-5 space-y-1">
                         {result.issues.map((issue: string, index: number) => (
-                          <li key={index} className="text-sm text-red-600">
+                          <li key={index} className="text-sm text-destructive">
                             {issue}
                           </li>
                         ))}
@@ -159,7 +159,7 @@ export default function ValidatorPage() {
                           <Badge 
                             key={index} 
                             variant="outline" 
-                            className="cursor-pointer bg-green-50 hover:bg-green-100"
+                            className="cursor-pointer border-success/40 text-success hover:bg-success/10"
                             onClick={() => setName(suggestion)}
                           >
                             {suggestion}
@@ -172,7 +172,7 @@ export default function ValidatorPage() {
               </Card>
               
               {!result.isValid && (
-                <Alert className="bg-blue-50 border-blue-200">
+                <Alert className="border-primary/30 bg-primary/5">
                   <Icons.info className="h-4 w-4" />
                   <AlertTitle>Try a suggested correction</AlertTitle>
                   <AlertDescription>
@@ -189,7 +189,7 @@ export default function ValidatorPage() {
         <CardHeader>
           <CardTitle>About Indian Name Validation</CardTitle>
         </CardHeader>
-        <CardContent className="prose prose-sm">
+        <CardContent className="prose prose-sm prose-invert">
           <p>
             This validator checks if a name follows common Indian naming conventions. It analyzes:
           </p>

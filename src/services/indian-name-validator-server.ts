@@ -172,7 +172,6 @@ const generateSuggestions = (name: string, issues: string[]): string[] => {
  * @returns Validation result with confidence score, issues, and suggestions
  */
 export async function validateIndianName(name: string): Promise<NameValidationResult> {
-  console.log(`[SERVER] Validating Indian name: "${name}"`);
   
   // Basic input validation
   if (!name || typeof name !== 'string') {
@@ -203,7 +202,6 @@ export async function validateIndianName(name: string): Promise<NameValidationRe
     message
   };
   
-  console.log(`[SERVER] Validation result for "${name}":`, { isValid, confidence, issuesCount: issues.length });
   
   return result;
 }

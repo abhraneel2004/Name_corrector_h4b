@@ -22,7 +22,6 @@ import {
   signInWithPopup,
 } from 'firebase/auth';
 import { auth } from '@/lib/firebase';
-import { signInAnonymously } from '@/lib/auth-utils';
 
 export function SignIn() {
   const [email, setEmail] = useState('');
@@ -32,11 +31,17 @@ export function SignIn() {
   const { toast } = useToast();
   const router = useRouter();
 
+  // Prefill the email when returning from a password reset (?email=...)
+  useEffect(() => {
+    const prefill = new URLSearchParams(window.location.search).get('email');
+    if (prefill) setEmail(prefill);
+  }, []);
+
   // Check if user is already signed in
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged((user) => {
       if (user) {
-        router.push('/');
+        router.push('/app');
       }
     });
 
@@ -53,11 +58,14 @@ export function SignIn() {
         description: 'Signed in successfully!',
         variant: 'success',
       });
-      router.push('/');
+      router.push('/app');
     } catch (error: any) {
       toast({
         title: 'Error',
-        description: error.message,
+        description:
+          error?.code === 'auth/password-does-not-meet-requirements'
+            ? 'Your password no longer meets the security policy. Use "Forgot password?" to set a new one.'
+            : error.message,
         variant: 'destructive',
       });
     } finally {
@@ -75,28 +83,7 @@ export function SignIn() {
         description: 'Signed in with Google successfully!',
         variant: 'success',
       });
-      router.push('/');
-    } catch (error: any) {
-      toast({
-        title: 'Error',
-        description: error.message,
-        variant: 'destructive',
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleAnonymousSignIn = async () => {
-    setLoading(true);
-    try {
-      await signInAnonymously();
-      toast({
-        title: 'Success',
-        description: 'Signed in as guest!',
-        variant: 'success',
-      });
-      router.push('/');
+      router.push('/app');
     } catch (error: any) {
       toast({
         title: 'Error',
@@ -109,41 +96,44 @@ export function SignIn() {
   };
 
   return (
-    <div className="flex bg-gradient-to-b from-primary/5 via-background to-background">
+    <div className="flex flex-1 bg-background">
       {/* Left side decorative panel */}
-      <div className="hidden md:flex md:w-1/2 bg-gradient-to-br from-primary/20 to-primary/5 flex-col justify-center items-center p-12">
-        <div className="max-w-md text-center">
+      <div className="hidden md:flex md:w-1/2 flex-col justify-center items-center border-r bg-card p-12">
+        <div className="w-full max-w-md">
           <div className="flex items-center space-x-3">
             <Link href="/" className="rounded-md">
-              <img src="./long_logo.png" alt="Logo" className="h-20 w-88" />
+              <img src="/long_logo.png" alt="Logo" className="h-12 w-auto" />
             </Link>
           </div>
-          <div className="mt-12 grid grid-cols-1 gap-4 text-left">
+          <p className="eyebrow mt-10">Records Audit Console</p>
+          <h1 className="mt-2 text-2xl font-semibold tracking-tight">Accurate case records, verified at source.</h1>
+          <p className="mt-3 text-sm text-muted-foreground">Audit and standardise names across police case files with AI-assisted review.</p>
+          <div className="mt-10 grid grid-cols-1 gap-5 border-t pt-8 text-left">
             <div className="flex items-start space-x-4">
-              <div className="bg-primary/10 p-2 rounded-full">
-                <Icons.check className="h-5 w-5 text-primary" />
+              <div className="rounded-sm border bg-background p-1.5">
+                <Icons.check className="h-3.5 w-3.5 text-primary" />
               </div>
               <div>
-                <h3 className="font-medium">Cultural Awareness</h3>
-                <p className="text-sm text-muted-foreground">Respects the cultural integrity of Indian names</p>
+                <h3 className="text-[13px] font-medium">Cultural Awareness</h3>
+                <p className="text-xs text-muted-foreground">Respects the cultural integrity of Indian names</p>
               </div>
             </div>
             <div className="flex items-start space-x-4">
-              <div className="bg-primary/10 p-2 rounded-full">
-                <Icons.check className="h-5 w-5 text-primary" />
+              <div className="rounded-sm border bg-background p-1.5">
+                <Icons.check className="h-3.5 w-3.5 text-primary" />
               </div>
               <div>
-                <h3 className="font-medium">Smart Corrections</h3>
-                <p className="text-sm text-muted-foreground">AI-powered suggestions with explanations</p>
+                <h3 className="text-[13px] font-medium">Smart Corrections</h3>
+                <p className="text-xs text-muted-foreground">AI-powered suggestions with explanations</p>
               </div>
             </div>
             <div className="flex items-start space-x-4">
-              <div className="bg-primary/10 p-2 rounded-full">
-                <Icons.check className="h-5 w-5 text-primary" />
+              <div className="rounded-sm border bg-background p-1.5">
+                <Icons.check className="h-3.5 w-3.5 text-primary" />
               </div>
               <div>
-                <h3 className="font-medium">Batch Processing</h3>
-                <p className="text-sm text-muted-foreground">Upload and correct thousands of names at once</p>
+                <h3 className="text-[13px] font-medium">Batch Processing</h3>
+                <p className="text-xs text-muted-foreground">Upload and correct thousands of names at once</p>
               </div>
             </div>
           </div>
@@ -152,13 +142,13 @@ export function SignIn() {
 
       {/* Right side sign in form */}
       <div className="flex-1 flex items-center justify-center p-6">
-        <Card className="w-full max-w-md shadow-xl">
-          <CardHeader className="space-y-1">
-            <div className="flex justify-center md:hidden mb-6">
-              <Icons.file className="h-12 w-12 text-primary" />
+        <Card className="w-full max-w-sm">
+          <CardHeader className="space-y-1.5">
+            <div className="flex md:hidden mb-4">
+              <img src="/long_logo.png" alt="Logo" className="h-9 w-auto" />
             </div>
-            <CardTitle className="text-3xl font-bold text-center">Welcome Back</CardTitle>
-            <CardDescription className="text-center">
+            <CardTitle className="text-lg font-semibold">Welcome Back</CardTitle>
+            <CardDescription>
               Sign in to your account to continue
             </CardDescription>
           </CardHeader>
@@ -179,7 +169,14 @@ export function SignIn() {
               <div className="space-y-2">
                 <div className="flex justify-between items-center">
                   <Label htmlFor="password">Password</Label>
-                  <Button variant="link" className="p-0 h-auto text-xs">
+                  <Button
+                    type="button"
+                    variant="link"
+                    className="p-0 h-auto text-xs"
+                    onClick={() =>
+                      router.push(email ? `/forgot-password?email=${encodeURIComponent(email)}` : '/forgot-password')
+                    }
+                  >
                     Forgot password?
                   </Button>
                 </div>
@@ -232,7 +229,7 @@ export function SignIn() {
                 <div className="w-full border-t border-border" />
               </div>
               <div className="relative flex justify-center text-xs uppercase">
-                <span className="px-2 bg-card text-muted-foreground">Or continue with</span>
+                <span className="px-2 bg-card text-[11px] tracking-[0.08em] text-muted-foreground">Or continue with</span>
               </div>
             </div>
 
@@ -245,15 +242,6 @@ export function SignIn() {
               >
                 <Icons.google className="mr-2 h-4 w-4" />
                 Google
-              </Button>
-              <Button
-                variant="outline"
-                onClick={handleAnonymousSignIn}
-                disabled={loading}
-                className="w-full"
-              >
-                <Icons.user className="mr-2 h-4 w-4" />
-                Continue as Guest
               </Button>
             </div>
           </CardContent>

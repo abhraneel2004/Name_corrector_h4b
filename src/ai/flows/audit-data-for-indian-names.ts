@@ -5,6 +5,8 @@
 import {ai, logGeminiAPICall} from '@/ai/ai-instance';
 import {validateIndianName, batchValidateIndianNames} from '@/services/indian-name-validator-server';
 import {z} from 'zod';
+import {verifyIdToken} from '@/lib/server-auth';
+import {RateLimitError, consumeLimit} from '@/lib/rate-limit';
 
 const AuditDataForIndianNamesInputSchema = z.object({
   data: z
@@ -27,8 +29,18 @@ const AuditDataForIndianNamesOutputSchema = z.object({
 export type AuditDataForIndianNamesOutput = z.infer<typeof AuditDataForIndianNamesOutputSchema>;
 
 export async function auditDataForIndianNames(
-  input: AuditDataForIndianNamesInput
-): Promise<AuditDataForIndianNamesOutput> {
+  input: AuditDataForIndianNamesInput,
+  idToken: string
+): Promise<AuditDataForIndianNamesOutput & { limitMessage?: string }> {
+  // Server actions are public endpoints, so verify the caller
+  const user = await verifyIdToken(idToken);
+  try {
+    consumeLimit('audit', user.uid);
+  } catch (error) {
+    // Returned rather than thrown: production builds hide the message of thrown server action errors
+    if (error instanceof RateLimitError) return {anomalies: [], limitMessage: error.message};
+    throw error;
+  }
   console.log("[SERVER] 🤖 Calling Gemini API for auditDataForIndianNames flow");
   logGeminiAPICall(`Starting auditDataForIndianNames flow with ${input.data.length} records`);
   
@@ -130,7 +142,6 @@ const auditDataForIndianNamesFlow = ai.defineFlow(
       // Process inspector names separately (not in batch)
       for (let i = 0; i < inspectorNames.length; i++) {
         const value = inspectorNames[i];
-        console.log("value", value);
         const nameInfo = await validateIndianName(value);
         
         if (!nameInfo.isValid) {
@@ -162,8 +173,7 @@ const auditDataForIndianNamesFlow = ai.defineFlow(
             // Skip empty values
             if (!value || value.trim() === '') continue;
             
-            console.log("value", value);
-            const nameInfo = await validateIndianName(value);
+                const nameInfo = await validateIndianName(value);
             
             if (!nameInfo.isValid) {
               anomalies.push({

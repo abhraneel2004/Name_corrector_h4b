@@ -37,7 +37,15 @@ import {
   Twitter,
   Github,
   Linkedin,
-  ChartBar
+  ChartBar,
+  Info,
+  Upload,
+  FileSpreadsheet,
+  Database,
+  ShieldCheck,
+  LogOut,
+  ListChecks,
+  ScanText,
 } from 'lucide-react';
 
 const Icons = {
@@ -83,7 +91,15 @@ const Icons = {
   twitter: Twitter,
   user: User,
   alertTriangle: AlertTriangle,
-  chart: ChartBar
+  info: Info,
+  chart: ChartBar,
+  upload: Upload,
+  fileSpreadsheet: FileSpreadsheet,
+  database: Database,
+  shieldCheck: ShieldCheck,
+  logOut: LogOut,
+  listChecks: ListChecks,
+  scan: ScanText,
 };
 
 export {Icons};

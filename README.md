@@ -13,8 +13,6 @@ A modern web application for Indian police departments to manage, audit, and cor
 
 - **CSV Data Import/Export**: Upload, view, and edit CSV files containing case records
 - **AI-powered Name Auditing**: Automatically detect and correct misspelled or improperly formatted Indian names
-- **Crime Statistics Analysis**: Visualize and analyze crime data across records
-- **Legal Context**: Get AI-generated legal information about crimes in your records
 - **Data Query**: Ask questions about your data and get AI-powered insights
 - **User Authentication**: Secure login with Firebase authentication
 - **Cloud Storage**: Automatically save and retrieve files from Firebase Firestore
@@ -91,7 +89,8 @@ Additional columns will be preserved but the above structure is recommended for 
 1. **Authentication**:
    - New users can sign up with email/password or Google account
    - Existing users can sign in with their credentials
-   - Anonymous sign-in is available for testing
+   - New accounts must verify their email address before using the console
+   - Passwords need at least 12 characters, with uppercase, lowercase and a number
 
 2. **File Management**:
    - Upload new CSV files from the File Management panel
@@ -110,12 +109,7 @@ Additional columns will be preserved but the above structure is recommended for 
    - See specific correction suggestions for Indian names
    - Apply corrections individually or all at once
 
-5. **Crime Analysis**:
-   - Click "Analyze Crimes" to see statistics about crime types
-   - Navigate to the dedicated crime statistics page
-   - Get AI-generated legal analysis of crimes in your dataset
-
-6. **Data Querying**:
+5. **Data Querying**:
    - Ask questions about your data in natural language
    - Receive AI-generated insights based on your records
 
@@ -130,11 +124,6 @@ Additional columns will be preserved but the above structure is recommended for 
 - **User**: Data Entry Officer
 - **Goal**: Ensure consistent spelling of Indian names
 - **Flow**: Load case file → Run Audit → Apply name corrections → Save and export
-
-### Crime Analysis
-- **User**: Police Inspector
-- **Goal**: Understand crime patterns in jurisdiction
-- **Flow**: Upload records → Navigate to crime analysis → View statistics → Get legal context
 
 ### Case Record Inquiry
 - **User**: Investigation Officer

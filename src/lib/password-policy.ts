@@ -15,4 +15,4 @@ export function passwordMeetsPolicy(password: string): boolean {
   return PASSWORD_RULES.every((rule) => rule.test(password));
 }
 
-export const PASSWORD_POLICY_MESSAGE = `Use at least ${MIN_PASSWORD_LENGTH} characters, including an uppercase letter, a lowercase letter and a number.`;
+export const STRENGTH_REQUIREMENTS_MESSAGE = `Use at least ${MIN_PASSWORD_LENGTH} characters, including an uppercase letter, a lowercase letter and a number.`;

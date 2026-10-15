@@ -23,7 +23,7 @@ import {
 } from 'firebase/auth';
 import { auth } from '@/lib/firebase';
 import { sendVerificationEmail } from '@/lib/auth-email';
-import { PASSWORD_POLICY_MESSAGE, passwordMeetsPolicy } from '@/lib/password-policy';
+import { STRENGTH_REQUIREMENTS_MESSAGE, passwordMeetsPolicy } from '@/lib/password-policy';
 import { PasswordChecklist } from '@/components/password-checklist';
 
 export function SignUp() {
@@ -51,7 +51,7 @@ export function SignUp() {
     if (!passwordMeetsPolicy(password)) {
       toast({
         title: 'Password too weak',
-        description: PASSWORD_POLICY_MESSAGE,
+        description: STRENGTH_REQUIREMENTS_MESSAGE,
         variant: 'destructive',
       });
       return;
@@ -72,7 +72,7 @@ export function SignUp() {
       toast({
         title: 'Error',
         description:
-          error?.code === 'auth/password-does-not-meet-requirements' ? PASSWORD_POLICY_MESSAGE : error.message,
+          error?.code === 'auth/password-does-not-meet-requirements' ? STRENGTH_REQUIREMENTS_MESSAGE : error.message,
         variant: 'destructive',
       });
     } finally {

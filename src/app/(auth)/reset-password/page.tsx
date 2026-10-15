@@ -11,7 +11,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Icons } from '@/components/icons';
 import { PasswordChecklist } from '@/components/password-checklist';
-import { PASSWORD_POLICY_MESSAGE, passwordMeetsPolicy } from '@/lib/password-policy';
+import { STRENGTH_REQUIREMENTS_MESSAGE, passwordMeetsPolicy } from '@/lib/password-policy';
 
 // Handles the links in Firebase's account emails once the console's action URL is set to <site>/reset-password.
 // Firebase sends every email action here, so this covers password resets (?mode=resetPassword&oobCode=...)
@@ -58,7 +58,7 @@ function ResetPasswordForm() {
   const savePassword = async () => {
     setError(null);
     if (!passwordMeetsPolicy(password)) {
-      setError(PASSWORD_POLICY_MESSAGE);
+      setError(STRENGTH_REQUIREMENTS_MESSAGE);
       return;
     }
     if (password !== confirmPassword) {
@@ -78,7 +78,7 @@ function ResetPasswordForm() {
           break;
         case 'auth/weak-password':
         case 'auth/password-does-not-meet-requirements':
-          setError(PASSWORD_POLICY_MESSAGE);
+          setError(STRENGTH_REQUIREMENTS_MESSAGE);
           break;
         case 'auth/network-request-failed':
           setError('Network error. Check your connection and try again.');

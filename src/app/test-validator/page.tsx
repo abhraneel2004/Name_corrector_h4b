@@ -5,9 +5,8 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { validateIndianName, batchValidateIndianNames } from '@/services/indian-name-validator';
-import { AlertCircle } from 'lucide-react';
+import { AlertCircle, Loader2 } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import Loading from '@/components/loading';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
@@ -88,7 +87,7 @@ export default function TestValidator() {
                     onChange={(e) => setName(e.target.value)}
                   />
                   <Button type="submit" disabled={loading || !name.trim()}>
-                    {loading ? <Loading size="sm" /> : 'Validate'}
+                    {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Validate'}
                   </Button>
                 </div>
               </form>
@@ -104,7 +103,7 @@ export default function TestValidator() {
               {result && !loading && (
                 <div className="mt-4">
                   <h3 className="text-lg font-medium mb-2">Result:</h3>
-                  <div className="bg-slate-100 p-4 rounded-md">
+                  <div className="bg-background border p-4 rounded-md font-mono text-xs">
                     <pre className="whitespace-pre-wrap">{JSON.stringify(result, null, 2)}</pre>
                   </div>
                 </div>
@@ -148,7 +147,7 @@ export default function TestValidator() {
                   className="w-full"
                   disabled={batchLoading || (!firstNames.trim() && !lastNames.trim())}
                 >
-                  {batchLoading ? <Loading size="sm" /> : 'Validate Batch'}
+                  {batchLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Validate Batch'}
                 </Button>
               </form>
               
@@ -163,7 +162,7 @@ export default function TestValidator() {
               {batchResult && !batchLoading && (
                 <div className="mt-4">
                   <h3 className="text-lg font-medium mb-2">Result:</h3>
-                  <div className="bg-slate-100 p-4 rounded-md max-h-96 overflow-y-auto">
+                  <div className="bg-background border p-4 rounded-md font-mono text-xs max-h-96 overflow-y-auto">
                     <pre className="whitespace-pre-wrap">{JSON.stringify(batchResult, null, 2)}</pre>
                   </div>
                 </div>

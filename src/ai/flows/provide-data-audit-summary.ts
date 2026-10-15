@@ -9,6 +9,9 @@
 
 import {ai} from '@/ai/ai-instance';
 import {z} from 'zod';
+import {verifyIdToken} from '@/lib/server-auth';
+import {consumeLimit} from '@/lib/rate-limit';
+import {withGeminiRetry} from '@/lib/gemini-retry';
 
 const ProvideDataAuditSummaryInputSchema = z.object({
   auditResults: z.string().describe('The detailed results from the data audit.'),
@@ -20,7 +23,13 @@ const ProvideDataAuditSummaryOutputSchema = z.object({
 });
 export type ProvideDataAuditSummaryOutput = z.infer<typeof ProvideDataAuditSummaryOutputSchema>;
 
-export async function provideDataAuditSummary(input: ProvideDataAuditSummaryInput): Promise<ProvideDataAuditSummaryOutput> {
+export async function provideDataAuditSummary(
+  input: ProvideDataAuditSummaryInput,
+  idToken: string
+): Promise<ProvideDataAuditSummaryOutput> {
+  // Server actions are public endpoints, so verify the caller
+  const user = await verifyIdToken(idToken);
+  consumeLimit('auditStep', user.uid);
   return provideDataAuditSummaryFlow(input);
 }
 
@@ -50,7 +59,7 @@ const provideDataAuditSummaryFlow = ai.defineFlow(
     outputSchema: ProvideDataAuditSummaryOutputSchema,
   },
   async input => {
-    const {output} = await prompt(input);
+    const {output} = await withGeminiRetry<Awaited<ReturnType<typeof prompt>>>(() => prompt(input));
     return output!;
   }
 );

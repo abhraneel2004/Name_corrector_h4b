@@ -9,6 +9,9 @@
 
 import {ai, logGeminiAPICall} from '@/ai/ai-instance';
 import {z} from 'zod';
+import {verifyIdToken} from '@/lib/server-auth';
+import {consumeLimit} from '@/lib/rate-limit';
+import {withGeminiRetry} from '@/lib/gemini-retry';
 
 // Define the name correction type
 interface NameCorrection {
@@ -35,12 +38,16 @@ const SuggestDataCorrectionsOutputSchema = z.object({
 });
 export type SuggestDataCorrectionsOutput = z.infer<typeof SuggestDataCorrectionsOutputSchema>;
 
-export async function suggestDataCorrections(input: SuggestDataCorrectionsInput): Promise<SuggestDataCorrectionsOutput> {
+export async function suggestDataCorrections(
+  input: SuggestDataCorrectionsInput,
+  idToken: string
+): Promise<SuggestDataCorrectionsOutput> {
+  // Server actions are public endpoints, so verify the caller (outside the try so failures aren't swallowed)
+  const user = await verifyIdToken(idToken);
+  consumeLimit('auditStep', user.uid);
   try {
     logGeminiAPICall(`Starting name correction flow for ${input.names.length} names`);
     
-    // Print input names to console
-    console.log('📥 INPUT NAMES:', JSON.stringify(input.names, null, 2));
     
     // Convert the input array to a JSON string for the prompt
     const namesObject = {
@@ -52,19 +59,13 @@ export async function suggestDataCorrections(input: SuggestDataCorrectionsInput)
       namesJson
     });
     
-    // Print output corrections to console
-    console.log('📤 OUTPUT CORRECTIONS:', JSON.stringify(result.correctionResults, null, 2));
     
     logGeminiAPICall(`Completed name correction flow with ${result.correctionResults.length} results`);
     return result;
   } catch (error) {
-    // Log the error but don't try to call toast here
     console.error('Error in name correction flow:', error);
-    
-    // Return a valid response with empty corrections
-    return {
-      correctionResults: []
-    };
+    // Rethrow: an empty result would wrongly tell the officer that no names need correcting
+    throw error;
   }
 }
 
@@ -242,11 +243,9 @@ const suggestDataCorrectionsFlow = ai.defineFlow(
   },
   async input => {
     logGeminiAPICall(`Processing names through Gemini API`);
-    console.log('🔄 PROCESSING: Sending input to Gemini API:', input.namesJson);
     
-    const {output} = await prompt(input);
+    const {output} = await withGeminiRetry<Awaited<ReturnType<typeof prompt>>>(() => prompt(input));
     
-    console.log('✅ RECEIVED: Response from Gemini API:', JSON.stringify(output, null, 2));
     return output!;
   }
 );
